@@ -8,26 +8,8 @@ sap.ui.define([
 ], function (Controller, JSONModel, Filter, FilterOperator, MessageBox, MessageToast) {
     "use strict";
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  WHY A LOCAL PROXY?
-    //
-    //  BTP UAA (OAuth2 token endpoint) blocks direct browser requests due to
-    //  CORS — the server does not send "Access-Control-Allow-Origin" headers
-    //  for browser-initiated POST requests. This is standard BTP behaviour
-    //  and cannot be changed from the client side.
-    //
-    //  Solution: token-proxy.js (Node.js) runs on localhost:3001.
-    //  The browser calls localhost → proxy calls BTP UAA server-side (no CORS)
-    //  → proxy returns the token to the browser.
-    //
-    //  START PROXY:   node token-proxy.js
-    //  START APP:     npm start
-    // ─────────────────────────────────────────────────────────────────────────
-
-    // ── Endpoints ─────────────────────────────────────────────────────────────
-    var TOKEN_PROXY_URL = "/token";
     var API_URL         = "/api/http/read-tally";
-    var REFRESH_URL     = "/api/refresh";
+    var VERSIONS_URL    = "/api/versions";
 
     return Controller.extend("app.tallyapp.controller.View1", {
 
@@ -46,39 +28,73 @@ sap.ui.define([
                     totalBalance: 0
                 },
                 data:          [],
+                versionList:   [],
+                versionIndex:  0,
+                versionLabel:  "",
+                hasPrev:       false,
+                hasNext:       false,
                 busy:          false,
                 hasError:      false,
                 lastRefreshed: ""
-
             });
             this.getView().setModel(oModel);
-            this.loadLedgerData();
+            this.loadVersions()
+                .then(this.loadLedgerData.bind(this));
         },
 
-        // ─────────────────────────────────────────────────────────────────────
-        // loadLedgerData
-        // Calls the Tally API via the token-proxy (which adds Bearer token server-side)
-        // ─────────────────────────────────────────────────────────────────────
+        updateVersionNav: function () {
+            var oModel = this.getView().getModel();
+            var list = oModel.getProperty("/versionList") || [];
+            var idx = oModel.getProperty("/versionIndex") || 0;
+            if (list.length === 0) {
+                oModel.setProperty("/versionLabel", "No versions");
+                oModel.setProperty("/hasPrev", false);
+                oModel.setProperty("/hasNext", false);
+                return;
+            }
+            var v = list[idx];
+            var d = v.timestamp ? new Date(v.timestamp).toLocaleDateString("en-IN", {
+                dateStyle: "medium"
+            }) : "?";
+            oModel.setProperty("/versionLabel",
+                "v" + v.id + " \u2014 " + d + " \u2014 " + v.company + " (" + v.totalRecords + " records)");
+            oModel.setProperty("/hasPrev", idx > 0);
+            oModel.setProperty("/hasNext", idx < list.length - 1);
+            oModel.setProperty("/selectedVersionId", v.id);
+        },
+
+        loadVersions: function () {
+            var oModel = this.getView().getModel();
+            return fetch(VERSIONS_URL, { method: "GET", headers: { "Accept": "application/json" } })
+                .then(function (r) { return r.json(); })
+                .then(function (list) {
+                    oModel.setProperty("/versionList", list);
+                    oModel.setProperty("/versionIndex", list.length > 0 ? list.length - 1 : 0);
+                    this.updateVersionNav();
+                }.bind(this))
+                .catch(function (e) {
+                    console.log("[View1] loadVersions failed:", e.message);
+                });
+        },
+
         loadLedgerData: function (retryCount) {
             retryCount = retryCount || 0;
             var oModel = this.getView().getModel();
-            oModel.setProperty("/busy",     true);
+            oModel.setProperty("/busy", true);
             oModel.setProperty("/hasError", false);
 
-            console.log("[View1] calling API at:", API_URL);
-            fetch(API_URL, {
+            var versionId = oModel.getProperty("/selectedVersionId");
+            var url = versionId ? API_URL + "?v=" + versionId : API_URL;
+
+            console.log("[View1] calling API at:", url);
+            fetch(url, {
                 method:  "GET",
                 headers: { "Accept": "application/json" }
             })
             .then(function (r) {
-                console.log("[View1] API response status:", r.status, r.statusText);
                 if (!r.ok) {
                     return r.text().then(function (body) {
-                        console.log("[View1] API error body:", body);
-                        throw new Error(
-                            "API error [HTTP " + r.status + "]: " + r.statusText +
-                            " | Body: " + body.substring(0, 500)
-                        );
+                        throw new Error("API error [HTTP " + r.status + "]: " + body.substring(0, 500));
                     });
                 }
                 return r.json();
@@ -110,14 +126,13 @@ sap.ui.define([
                     "Last refreshed: " + new Date().toLocaleTimeString("en-IN"));
                 oModel.setProperty("/busy", false);
 
-                MessageToast.show("Loaded " + aRows.length + " ledger records");
+                MessageToast.show("Loaded " + aRows.length + " records");
             }.bind(this))
             .catch(function (e) {
                 console.log("[View1] loadLedgerData FAILED:", e.message);
-                oModel.setProperty("/busy",     false);
+                oModel.setProperty("/busy", false);
                 oModel.setProperty("/hasError", true);
 
-                // Auto-retry on 503 (upstream transient failure / cold-start)
                 if (e.message.indexOf("HTTP 503") >= 0 && retryCount < 3) {
                     var delay = (retryCount + 1) * 3000;
                     console.log("[View1] 503 detected (attempt " + (retryCount + 1) + "), retrying in " + delay + "ms...");
@@ -141,9 +156,27 @@ sap.ui.define([
             }.bind(this));
         },
 
-        // ─────────────────────────────────────────────────────────────────────
-        // UI event handlers
-        // ─────────────────────────────────────────────────────────────────────
+        onPrevVersion: function () {
+            var oModel = this.getView().getModel();
+            var idx = oModel.getProperty("/versionIndex") || 0;
+            if (idx > 0) {
+                oModel.setProperty("/versionIndex", idx - 1);
+                this.updateVersionNav();
+                this.loadLedgerData();
+            }
+        },
+
+        onNextVersion: function () {
+            var oModel = this.getView().getModel();
+            var idx = oModel.getProperty("/versionIndex") || 0;
+            var list = oModel.getProperty("/versionList") || [];
+            if (idx < list.length - 1) {
+                oModel.setProperty("/versionIndex", idx + 1);
+                this.updateVersionNav();
+                this.loadLedgerData();
+            }
+        },
+
         onSearch: function (oEvent) {
             var sQuery   = oEvent.getSource().getValue().trim();
             var oBinding = this.byId("ledgerTable").getBinding("items");
@@ -165,18 +198,13 @@ sap.ui.define([
             var oModel = this.getView().getModel();
             oModel.setProperty("/busy", true);
 
-            fetch(REFRESH_URL, { method: "POST", headers: { "Accept": "application/json" } })
+            this.loadVersions()
                 .then(function () {
-                    this.loadLedgerData();
-                }.bind(this))
-                .catch(function () {
+                    this.updateVersionNav();
                     this.loadLedgerData();
                 }.bind(this));
         },
 
-        // ─────────────────────────────────────────────────────────────────────
-        // Formatters
-        // ─────────────────────────────────────────────────────────────────────
         formatBalance: function (v) {
             if (v === null || v === undefined) { return "—"; }
             return new Intl.NumberFormat("en-IN", {

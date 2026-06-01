@@ -50,6 +50,21 @@
                         text="{/lastRefreshed}"
                         design="Bold"
                         class="sapUiSmallMarginEnd"/>
+                    <Button id="prevVersionBtn"
+                        icon="sap-icon://navigation-left-arrow"
+                        tooltip="Previous version"
+                        press=".onPrevVersion"
+                        enabled="{/hasPrev}"
+                        class="sapUiSmallMarginEnd"/>
+                    <Label text="{/versionLabel}"
+                        design="Bold"
+                        class="sapUiSmallMarginEnd"/>
+                    <Button id="nextVersionBtn"
+                        icon="sap-icon://navigation-right-arrow"
+                        tooltip="Next version"
+                        press=".onNextVersion"
+                        enabled="{/hasNext}"
+                        class="sapUiSmallMarginEnd"/>
                     <Button
                         id="refreshBtn"
                         text="Refresh"
