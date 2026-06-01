@@ -1,0 +1,33 @@
+{
+  "name": "tallyapp",
+  "version": "0.0.1",
+  "description": "Displays Tally data from SAP Integration Suite",
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5"
+  ],
+  "main": "webapp/index.html",
+  "devDependencies": {
+    "@sap-ux/eslint-plugin-fiori-tools": "^9.0.0",
+    "@sap/ux-ui5-tooling": "1",
+    "@ui5/cli": "^4.0.33",
+    "eslint": "^9",
+    "http-proxy-middleware": "^3.0.5",
+    "ui5-middleware-simpleproxy": "^3.7.0"
+  },
+  "scripts": {
+    "start": "ui5 serve --open \"/index.html?sap-ui-xx-viewCache=false\"", 
+    "start-backend": "node backend/src/server.js",
+    "start-local": "ui5 serve --config ./ui5-local.yaml --open \"/index.html?sap-ui-xx-viewCache=false\"",
+    "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
+    "lint": "eslint ./",
+    "deploy": "fiori verify",
+    "deploy-config": "fiori add deploy-config",
+    "start-noflp": "ui5 serve --open \"/index.html?sap-ui-xx-viewCache=false\"",
+    "int-test": "fiori run --open \"test/integration/opaTests.qunit.html\"",
+    "start-variants-management": "fiori run --open \"/preview.html#app-preview\"",
+    "unit-test": "fiori run --open \"test/unit/unitTests.qunit.html\""
+  },
+  "sapuxLayer": "CUSTOMER_BASE"
+}

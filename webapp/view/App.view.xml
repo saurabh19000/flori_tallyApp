@@ -1,0 +1,19 @@
+<mvc:View
+    controllerName="app.tallyapp.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+
+    <!--
+        App.view.xml — ROOT SHELL (DO NOT ADD CONTENT HERE)
+
+        manifest.json → rootView loads THIS file as the outer shell.
+        manifest.json → routing.config.controlId = "app"
+        The router INJECTS View1.view.xml into <App id="app"> automatically.
+
+        RULE: id="app" MUST exactly match manifest controlId = "app"
+    -->
+
+    <App id="app" />
+
+</mvc:View>

@@ -1,0 +1,420 @@
+<mvc:View
+    controllerName="app.tallyapp.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true">
+
+    <!--
+    ╔══════════════════════════════════════════════════════════════════════════╗
+      View1.view.xml — TALLY LEDGER DASHBOARD
+
+      CRITICAL FIXES:
+      ✅ FIX 1 (previous): Removed <footer> from sap.m.Table
+         → sap.m.Table has NO footer aggregation
+      ✅ FIX 2 (this file): Removed <footer> from sap.m.Panel
+         → sap.m.Panel ALSO has NO footer aggregation
+         → Both caused UI5 to try loading nonexistent 'sap/m/footer.js'
+         → Script load error → TargetView1 routing target failed → blank screen
+      ✅ FIX 3: Table status bar now uses a plain <Toolbar> inside
+         the Panel content area, after the Table — fully supported
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    -->
+
+    <Page
+        id="dashboardPage"
+        title="Tally Ledger Dashboard"
+        busy="{/busy}"
+        busyIndicatorDelay="0"
+        showHeader="true"
+        backgroundDesign="List">
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             TOP APP BAR
+             ═══════════════════════════════════════════════════════════════ -->
+        <customHeader>
+            <Bar>
+                <contentLeft>
+                    <core:Icon
+                        src="sap-icon://document"
+                        size="1.4rem"
+                        color="#0070F2"
+                        class="sapUiSmallMarginEnd"/>
+                    <Title
+                        text="Tally Ledger Intelligence"
+                        level="H2"
+                        titleStyle="H4"/>
+                </contentLeft>
+                <contentRight>
+                    <Label
+                        text="{/lastRefreshed}"
+                        design="Bold"
+                        class="sapUiSmallMarginEnd"/>
+                    <Button
+                        id="refreshBtn"
+                        text="Refresh"
+                        icon="sap-icon://refresh"
+                        type="Emphasized"
+                        press=".onRefresh"
+                        tooltip="Reload ledger data from Tally Middleware"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+
+            <!-- ═══════════════════════════════════════════════════════════
+                 SECTION 1 — DATA SOURCE HEADER
+                 ═══════════════════════════════════════════════════════════ -->
+            <Panel
+                id="headerPanel"
+                backgroundDesign="Solid"
+                class="sapUiSmallMargin">
+
+                <headerToolbar>
+                    <Toolbar height="3rem">
+                        <core:Icon
+                            src="sap-icon://business-objects-experience"
+                            size="1rem"
+                            class="sapUiSmallMarginEnd"/>
+                        <Title
+                            text="Data Source Summary"
+                            level="H3"
+                            titleStyle="H5"/>
+                        <ToolbarSpacer/>
+                        <ObjectStatus
+                            text="LIVE"
+                            state="Success"
+                            icon="sap-icon://connected"
+                            inverted="true"/>
+                    </Toolbar>
+                </headerToolbar>
+                
+                <HBox
+                    wrap="Wrap"
+                    justifyContent="SpaceBetween"
+                    alignItems="Center"
+                    class="sapUiSmallMargin">
+
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Company" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/company}"
+                            state="Information"
+                            icon="sap-icon://home"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Data Type" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/dataType}"
+                            state="None"
+                            icon="sap-icon://database"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Last Sync" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/timestamp}"
+                            state="None"
+                            icon="sap-icon://appointment-2"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Total Records" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/totalRecords}"
+                            state="Success"
+                            icon="sap-icon://list"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/syncId}"
+                            state="None"
+                            icon="sap-icon://identifier"/>
+                    </VBox>
+
+                </HBox>
+            </Panel>
+
+            <!-- ═══════════════════════════════════════════════════════════
+                 SECTION 2 — KPI TILES
+                 ═══════════════════════════════════════════════════════════ -->
+            <Panel
+                id="kpiPanel"
+                backgroundDesign="Transparent"
+                class="sapUiSmallMarginBeginEnd">
+
+                <headerToolbar>
+                    <Toolbar height="2.5rem">
+                        <core:Icon
+                            src="sap-icon://key-user-settings"
+                            size="1rem"
+                            class="sapUiSmallMarginEnd"/>
+                        <Title
+                            text="Key Performance Indicators"
+                            level="H3"
+                            titleStyle="H6"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <TileContainer
+                    id="kpiTileContainer"
+                    editable="false">
+
+                    <StandardTile
+                        title="Total Ledgers"
+                        number="{/summary/totalLedgers}"
+                        numberUnit="Ledgers"
+                        icon="sap-icon://ledger"
+                        type="Monitor"
+                        infoState="Success"
+                        info="All accounts"/>
+
+                    <StandardTile
+                        title="Party Ledgers"
+                        number="{/summary/partyLedgers}"
+                        numberUnit="Parties"
+                        icon="sap-icon://group"
+                        type="Monitor"
+                        infoState="Warning"
+                        info="Vendor / Customer"/>
+
+                    <StandardTile
+                        title="With GSTIN"
+                        number="{/summary/withGstin}"
+                        numberUnit="Entries"
+                        icon="sap-icon://official-service"
+                        type="Monitor"
+                        infoState="Information"
+                        info="GST Registered"/>
+
+                    <StandardTile
+                        title="With Email"
+                        number="{/summary/withEmail}"
+                        numberUnit="Entries"
+                        icon="sap-icon://email"
+                        type="Monitor"
+                        infoState="Information"
+                        info="Email on record"/>
+
+                    <StandardTile
+                        title="Total Balance"
+                        number="{
+                            path: '/summary/totalBalance',
+                            formatter: '.formatTotalBalance'
+                        }"
+                        numberUnit="INR"
+                        icon="sap-icon://currency"
+                        type="Monitor"
+                        infoState="Success"
+                        info="Aggregate closing"/>
+
+                </TileContainer>
+            </Panel>
+
+            <!-- ═══════════════════════════════════════════════════════════
+                 SECTION 3 — LEDGER TABLE
+                 NOTE: NO <footer> on Panel or Table.
+                 The status bar is a plain <Toolbar> placed AFTER
+                 the <Table> inside the Panel's default content aggregation.
+                 sap.m.Panel content aggregation accepts any controls. ✅
+                 ═══════════════════════════════════════════════════════════ -->
+            <Panel
+                id="tablePanel"
+                backgroundDesign="Solid"
+                class="sapUiSmallMargin">
+
+                <headerToolbar>
+                    <Toolbar>
+                        <core:Icon
+                            src="sap-icon://table-chart"
+                            size="1rem"
+                            class="sapUiSmallMarginEnd"/>
+                        <Title
+                            text="Ledger Register"
+                            level="H3"
+                            titleStyle="H6"/>
+                        <ToolbarSpacer/>
+                        <SearchField
+                            id="searchField"
+                            placeholder="Search by ledger name…"
+                            width="22rem"
+                            liveChange=".onSearch"
+                            search=".onSearch"
+                            showRefreshButton="false"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <!-- The Table — NO footer aggregation here -->
+                <Table
+                    id="ledgerTable"
+                    items="{path: '/data'}"
+                    growing="true"
+                    growingThreshold="10"
+                    growingScrollToLoad="false"
+                    alternateRowColors="true"
+                    sticky="ColumnHeaders"
+                    noDataText="No ledger records found. Try refreshing or clearing the search."
+                    mode="None"
+                    popinLayout="GridSmall"
+                    contextualWidth="Auto">
+
+                    <columns>
+
+                        <Column
+                            width="20%"
+                            minScreenWidth="Small"
+                            demandPopin="false">
+                            <Text text="Ledger Name"/>
+                        </Column>
+
+                        <Column
+                            width="18%"
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                            popinDisplay="Inline">
+                            <Text text="Parent Group"/>
+                        </Column>
+
+                        <Column
+                            width="10%"
+                            minScreenWidth="Tablet"                                      
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                            hAlign="Center">
+                            <Text text="Type"/>
+                        </Column>
+
+                        <Column
+                            width="14%"
+                            minScreenWidth="Desktop"
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                            hAlign="End">
+                            <Text text="Opening Balance"/>
+                        </Column>
+
+                        <Column
+                            width="14%"
+                            minScreenWidth="Small"
+                            demandPopin="false"
+                            hAlign="End">
+                            <Text text="Closing Balance"/>
+                        </Column>
+
+                        <Column
+                            width="8%"
+                            minScreenWidth="Desktop"
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                            hAlign="Center">
+                            <Text text="Currency"/>
+                        </Column>
+
+                        <Column
+                            width="8%"
+                            minScreenWidth="Desktop"
+                            demandPopin="true"
+                            popinDisplay="Inline"
+                            hAlign="Center">
+                            <Text text="Country"/>
+                        </Column>
+
+                    </columns>
+
+                    <items>
+                        <ColumnListItem
+                            type="Active"
+                            highlight="{
+                                path: 'closingBalance',
+                                formatter: '.formatBalanceState'
+                            }"
+                            highlightText="Balance state indicator">
+
+                            <ObjectIdentifier
+                                title="{name}"
+                                titleActive="false"/>
+
+                            <Text text="{parentGroup}" wrapping="false"/>
+
+                            <Label
+                                text="{type}"
+                                design="Bold"
+                                wrapping="false"/>
+
+                            <ObjectNumber
+                                number="{
+                                    path: 'openingBalance',
+                                    formatter: '.formatBalance'
+                                }"
+                                state="None"
+                                textAlign="End"/>
+
+                            <ObjectNumber
+                                number="{
+                                    path: 'closingBalance',
+                                    formatter: '.formatBalance'
+                                }"
+                                state="{
+                                    path: 'closingBalance',
+                                    formatter: '.formatBalanceState'
+                                }"
+                                emphasized="true"
+                                textAlign="End"/>
+
+                            <Text text="{currency}" wrapping="false"/>
+
+                            <HBox alignItems="Center" justifyContent="Center">
+                                <core:Icon
+                                    src="sap-icon://world"
+                                    tooltip="{countryCode}"
+                                    color="#0070F2"
+                                    class="sapUiTinyMarginEnd"/>
+                                <Text text="{countryCode}" wrapping="false"/>
+                            </HBox>
+
+                        </ColumnListItem>
+                    </items>
+
+                </Table>
+
+                <!-- Status bar: plain Toolbar in Panel content — fully valid ✅ -->
+                <Toolbar
+                    id="tableStatusBar"
+                    height="2.5rem">
+                    <core:Icon
+                        src="sap-icon://connected"
+                        color="#107E3E"
+                        class="sapUiSmallMarginEnd"/>
+                    <Label text="Live · SAP Integration Suite → Tally Middleware"/>
+                    <ToolbarSpacer/>
+                    <Label
+                        text="{= ${/totalRecords} + ' records · ' + ${/company} + ' · ' + ${/dataType}}"
+                        design="Bold"/>
+                </Toolbar>
+
+            </Panel>
+
+        </content>
+
+        <!-- Page footer — sap.m.Page DOES support footer aggregation ✅ -->
+        <footer>
+            <Bar design="Footer">
+                <contentLeft>
+                    <core:Icon src="sap-icon://shield" color="#107E3E"/>
+                    <Label
+                        text="  Connected · SAP Integration Suite → Tally Middleware Reader iFlow"
+                        design="Bold"
+                        class="sapUiSmallMarginBegin"/>
+                </contentLeft>
+                <contentRight>
+                    <Label text="Fiori Ledger Dashboard · INR · India"/>
+                </contentRight>
+            </Bar>
+        </footer>
+
+    </Page>
+</mvc:View>

@@ -1,0 +1,40 @@
+{
+  "company": "My Company",
+  "totalRecords": 5,
+  "summary": {
+    "totalLedgers": 5,
+    "partyLedgers": 3,
+    "withGstin": 2,
+    "withEmail": 1,
+    "totalBalance": 150000
+  },
+  "data": [
+    {
+      "name": "Cash",
+      "parentGroup": "Cash-in-Hand",
+      "type": "General",
+      "openingBalance": 0,
+      "closingBalance": 777,
+      "currency": "INR",
+      "countryCode": "IN"
+    },
+    {
+      "name": "Profit & Loss A/c",
+      "parentGroup": "Primary",
+      "type": "General",
+      "openingBalance": 0,
+      "closingBalance": 0,
+      "currency": "INR",
+      "countryCode": "IN"
+    },
+    {
+      "name": "Shivam",
+      "parentGroup": "Capital Account",
+      "type": "General",
+      "openingBalance": 563,
+      "closingBalance": 563,
+      "currency": "INR",
+      "countryCode": "IN"
+    }
+  ]
+}
