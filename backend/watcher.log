@@ -1,0 +1,160 @@
+──────────────────────────────────────────────
+  Watch Ingest Started
+──────────────────────────────────────────────
+  Drop .json files into: /home/user/projects/tallyapp/backend/incoming
+  Watching every 5 seconds...
+
+[watch] Found: Ledgers_aa.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 6
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoepSG0kAp24TqYwS_5gEZJOSA9
+  CPI data store ID: f4f104da-c5c3-443b-9296-620ad8283f91
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoepSG0kAp24TqYwS_5gEZJOSA9
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_aa.json
+
+[watch] Found: Ledgers_Aa_1708394480749.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 6
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqxMqN2EqmA4SP4uPjQKVpupT
+  CPI data store ID: ea4f2df5-bb5f-4e7d-b59f-35c20062b972
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqxMqN2EqmA4SP4uPjQKVpupT
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480749.json
+
+[watch] Found: Ledgers_Aa_1708394480959.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 1
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqxPN0zEc4Zau8ICMoij9UvoQ
+  CPI data store ID: ce8079a9-b5a9-41e6-8b18-4653fe574061
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqxPN0zEc4Zau8ICMoij9UvoQ
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480959.json
+
+[watch] Found: Ledgers_Aa_1708394480979.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 0
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqxNgBWbfM-yXGcnA3g-gbzB3
+  CPI data store ID: 0c774e6d-5af2-487e-8c87-3390b92b5d2f
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqxNgBWbfM-yXGcnA3g-gbzB3
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480979.json
+
+[watch] Found: Ledgers_Aa_1708394480749.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 6
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqydEF0uPupZdiBBTui4XwM9v
+  CPI data store ID: 7e38e8f1-efca-4858-b6d7-0ca4c65ab20d
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqydEF0uPupZdiBBTui4XwM9v
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480749.json
+
+[watch] Found: Ledgers_Aa_1708394480959.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 1
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqycohtnKKpQzs1MwIZNh3iWV
+  CPI data store ID: 0d1aacfc-3853-42d9-bbb1-908c418692c8
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqycohtnKKpQzs1MwIZNh3iWV
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480959.json
+
+[watch] Found: Ledgers_Aa_1708394480979.json (Ledgers)
+[watch] Output:
+──────────────────────────────────────────────
+  Push to CPI + Notify Backend
+──────────────────────────────────────────────
+  Data Type : Ledgers
+  Company   : Aa
+  Records   : 0
+
+[1/3] Getting OAuth token from token-proxy...
+[2/3] Pushing data to CPI...
+  CPI response: 200
+  CPI message ID: AGoeqyfawlt9oE1MxgGuyBdnt7EQ
+  CPI data store ID: 937e6279-47cd-4771-bf63-115fbd956e7c
+[3/3] Notifying backend with syncId...
+  Backend response: success= true
+  Dashboard syncId: AGoeqyfawlt9oE1MxgGuyBdnt7EQ
+
+✅ Done! Refresh your Fiori dashboard to see the CPI message ID.
+
+[watch] ✅ Processed: Ledgers_Aa_1708394480979.json
+

@@ -50,28 +50,13 @@
                         text="{/lastRefreshed}"
                         design="Bold"
                         class="sapUiSmallMarginEnd"/>
-                    <Button id="prevVersionBtn"
-                        icon="sap-icon://navigation-left-arrow"
-                        tooltip="Previous version"
-                        press=".onPrevVersion"
-                        enabled="{/hasPrev}"
-                        class="sapUiSmallMarginEnd"/>
-                    <Label text="{/versionLabel}"
-                        design="Bold"
-                        class="sapUiSmallMarginEnd"/>
-                    <Button id="nextVersionBtn"
-                        icon="sap-icon://navigation-right-arrow"
-                        tooltip="Next version"
-                        press=".onNextVersion"
-                        enabled="{/hasNext}"
-                        class="sapUiSmallMarginEnd"/>
                     <Button
-                        id="refreshBtn"
+                        id="syncBtn"
                         text="Refresh"
                         icon="sap-icon://refresh"
                         type="Emphasized"
                         press=".onRefresh"
-                        tooltip="Reload ledger data from Tally Middleware"/>
+                        tooltip="Refresh from CAP"/>
                 </contentRight>
             </Bar>
         </customHeader>
@@ -98,7 +83,7 @@
                             titleStyle="H5"/>
                         <ToolbarSpacer/>
                         <ObjectStatus
-                            text="LIVE"
+                            text="LIVE \u00B7 15s"
                             state="Success"
                             icon="sap-icon://connected"
                             inverted="true"/>
@@ -149,6 +134,22 @@
                             text="{/syncId}"
                             state="None"
                             icon="sap-icon://identifier"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="CPI Message ID" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/cpiMessageId}"
+                            state="None"
+                            icon="sap-icon://message-id"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Sync Timestamp" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus
+                            text="{/timestamp}"
+                            state="None"
+                            icon="sap-icon://appointment-2"/>
                     </VBox>
 
                 </HBox>
@@ -404,10 +405,10 @@
                         src="sap-icon://connected"
                         color="#107E3E"
                         class="sapUiSmallMarginEnd"/>
-                    <Label text="Live · SAP Integration Suite → Tally Middleware"/>
+                    <Label text="Live · Auto-refresh every 15s"/>
                     <ToolbarSpacer/>
                     <Label
-                        text="{= ${/totalRecords} + ' records · ' + ${/company} + ' · ' + ${/dataType}}"
+                        text="{= ${/totalRecords} + ' records \u00B7 ' + ${/company} + ' \u00B7 ' + ${/dataType}}"
                         design="Bold"/>
                 </Toolbar>
 
@@ -421,7 +422,7 @@
                 <contentLeft>
                     <core:Icon src="sap-icon://shield" color="#107E3E"/>
                     <Label
-                        text="  Connected · SAP Integration Suite → Tally Middleware Reader iFlow"
+                        text="  Connected · CAP OData Service → Tally Database"
                         design="Bold"
                         class="sapUiSmallMarginBegin"/>
                 </contentLeft>

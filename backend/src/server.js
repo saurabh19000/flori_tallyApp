@@ -3,7 +3,7 @@ const cors = require("cors");
 const { router } = require("./routes");
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -15,6 +15,8 @@ app.listen(PORT, () => {
     console.log("  GET  /api/versions           (list all versions)");
     console.log("  GET  /api/versions/:id       (get version by id)");
     console.log("  GET  /api/http/read-tally    (latest version)");
+    console.log("  GET  /api/http/read-tally/fresh  (fresh from CPI with metadata)");
+    console.log("  POST /api/ingest            (ingest from external middleware)");
     console.log("  POST /api/push               (generic push)");
     console.log("  POST /api/push/ledgers       (ledgers push)");
     console.log("  POST /api/push/vouchers      (vouchers push)");

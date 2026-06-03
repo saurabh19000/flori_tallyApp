@@ -47,7 +47,7 @@ const crypto = require("crypto");
 
 // ── Config ─────────────────────────────────────────────────
 const TOKEN_PROXY  = "localhost:3002";
-const BACKEND      = "localhost:3001";
+const BACKEND      = "localhost:3003";
 const CPI_API_BASE = "https://690a9d08trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com";
 
 // ── Helpers ────────────────────────────────────────────────
@@ -70,7 +70,7 @@ function getToken() {
 function pushToCpi(token, payload) {
     return new Promise(function (resolve, reject) {
         var body = JSON.stringify(payload);
-        var url = new URL(CPI_API_BASE + "/http/push-tally");
+        var url = new URL(CPI_API_BASE + "/http/tally-write");
         var options = {
             hostname: url.hostname,
             port:     443,
@@ -87,11 +87,14 @@ function pushToCpi(token, payload) {
             var data = "";
             res.on("data", function (chunk) { data += chunk; });
             res.on("end", function () {
-                var cpiMsgId = res.headers["x-cpi-messageid"]
+                var cpiMsgId = res.headers["sap_messageprocessinglogid"]
                     || res.headers["sap-message-id"]
+                    || res.headers["x-cpi-messageid"]
                     || res.headers["x-request-id"]
+                    || res.headers["x-vcap-request-id"]
                     || crypto.randomUUID();
-                resolve({ status: res.statusCode, body: data, cpiMessageId: cpiMsgId });
+                var cpiDataStoreId = res.headers["sapdatastoreid"] || null;
+                resolve({ status: res.statusCode, body: data, cpiMessageId: cpiMsgId, cpiDataStoreId: cpiDataStoreId });
             });
         });
         req.on("error", reject);
@@ -100,19 +103,23 @@ function pushToCpi(token, payload) {
     });
 }
 
-function notifyBackend(syncId, payload, dataType) {
+function notifyBackend(syncId, payload, dataType, cpiDataStoreId) {
+    var pushDate = new Date().toUTCString();
     return new Promise(function (resolve, reject) {
         var body = JSON.stringify({
-            syncId:      syncId,
-            company:     payload.company,
-            totalRecords: payload.totalRecords,
-            summary:     payload.summary,
-            data:        payload.data,
-            dataType:    dataType
+            syncId:         syncId,
+            cpiMessageId:   syncId,
+            cpiDataStoreId: cpiDataStoreId,
+            cpiPushDate:    pushDate,
+            company:        payload.company,
+            totalRecords:   payload.totalRecords,
+            summary:        payload.summary,
+            data:           payload.data,
+            dataType:       dataType
         });
         var options = {
             hostname: "localhost",
-            port:     3001,
+            port:     3003,
             path:     "/api/push",
             method:   "POST",
             headers: {
@@ -126,6 +133,39 @@ function notifyBackend(syncId, payload, dataType) {
             res.on("end", function () {
                 try { resolve(JSON.parse(data)); }
                 catch (e) { resolve({ raw: data }); }
+            });
+        });
+        req.on("error", reject);
+        req.write(body);
+        req.end();
+    });
+}
+
+function pushToCap(payload, dataType, cpiMessageId) {
+    return new Promise(function (resolve, reject) {
+        var body = JSON.stringify({
+            company:      payload.company,
+            dataType:     dataType,
+            cpiMessageId: cpiMessageId || "local-" + Date.now(),
+            totalRecords: payload.totalRecords || 0,
+            summary:      JSON.stringify(payload.summary || {}),
+            data:         JSON.stringify(payload.data || [])
+        });
+        var options = {
+            hostname: "localhost",
+            port:     4004,
+            path:     "/odata/v4/tally/pushData",
+            method:   "POST",
+            headers: {
+                "Content-Type":   "application/json",
+                "Content-Length": Buffer.byteLength(body)
+            }
+        };
+        var req = http.request(options, function (res) {
+            var data = "";
+            res.on("data", function (chunk) { data += chunk; });
+            res.on("end", function () {
+                resolve({ status: res.statusCode, body: data });
             });
         });
         req.on("error", reject);
@@ -155,7 +195,7 @@ function main() {
     var payload = JSON.parse(fs.readFileSync(dataFile, "utf8"));
 
     console.log("──────────────────────────────────────────────");
-    console.log("  Push to CPI + Notify Backend");
+    console.log("  Push to CAP (Tally Backend Service)");
     console.log("──────────────────────────────────────────────");
     console.log("  Data Type :", dataType);
     console.log("  Company   :", payload.company);
@@ -165,21 +205,28 @@ function main() {
     console.log("[1/3] Getting OAuth token from token-proxy...");
     getToken()
         .then(function (token) {
-            console.log("[2/3] Pushing data to CPI...");
+            console.log("[2/3] Pushing data to CPI (to get real message ID)...");
             return pushToCpi(token, payload);
         })
         .then(function (result) {
             console.log("  CPI response:", result.status);
             console.log("  CPI message ID:", result.cpiMessageId);
+            var cpiMsgId = result.cpiMessageId;
 
-            console.log("[3/3] Notifying backend with syncId...");
-            return notifyBackend(result.cpiMessageId, payload, dataType);
+            console.log("[3/3] Pushing to CAP with CPI message ID...");
+            return pushToCap(payload, dataType, cpiMsgId);
         })
-        .then(function (backendResult) {
-            console.log("  Backend response: success=", backendResult.success);
-            console.log("  Dashboard syncId:", backendResult.syncId);
-            console.log("");
-            console.log("✅ Done! Refresh your Fiori dashboard to see the CPI message ID.");
+        .then(function (result) {
+            console.log("  CAP response:", result.status);
+            try {
+                var parsed = JSON.parse(result.body);
+                console.log("  Sync ID:", parsed.syncId);
+                console.log("  Records stored:", parsed.records);
+                console.log("");
+                console.log("✅ Done! Data stored in CAP database with real CPI message ID.");
+            } catch (e) {
+                console.log("  Raw:", result.body);
+            }
         })
         .catch(function (err) {
             console.error("❌ Failed:", err.message);

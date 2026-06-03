@@ -29,7 +29,7 @@ const CLIENT_SECRET = "38dc02e8-3063-4682-bb4e-7d67b79cc8c6$S6n7sROZpLCALLQQ-_2Z
 const TOKEN_URL     = "https://690a9d08trial.authentication.ap21.hana.ondemand.com/oauth/token";
 
 const PROXY_PORT   = 3002;
-const CPI_API_BASE = "https://690a9d08trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com";
+const CPI_API_BASE = "https://690a9d08trial.integrationsuite-trial.cfapps.ap21.hana.ondemand.com";
 
 // ── Kill whatever is already on PROXY_PORT ────────────────────────────────────
 function killPortIfBusy(port) {
