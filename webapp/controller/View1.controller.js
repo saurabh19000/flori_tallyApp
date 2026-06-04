@@ -9,6 +9,7 @@ sap.ui.define([
     "use strict";
 
     var CAP_URL  = "/odata/v4/tally";
+    var TABS = { LEDGERS: "Ledgers", VOUCHERS: "Vouchers", STOCK: "StockItems" };
 
     return Controller.extend("app.tallyapp.controller.View1", {
 
@@ -20,28 +21,17 @@ sap.ui.define([
                 timestamp:     "",
                 totalRecords:  0,
                 cpiMessageId:  "",
-                summary: {
-                    totalLedgers: 0,
-                    partyLedgers: 0,
-                    withGstin:    0,
-                    withEmail:    0,
-                    totalBalance: 0
-                },
-                data:          [],
+                summary:       { totalLedgers: 0, partyLedgers: 0, withGstin: 0, withEmail: 0, totalBalance: 0 },
+                ledgers:       [],
+                vouchers:      [],
+                stockItems:    [],
                 busy:          false,
                 hasError:      false,
-                lastRefreshed: ""
+                lastRefreshed: "",
+                tab:           TABS.LEDGERS
             });
             this.getView().setModel(oModel);
             this.loadData();
-            this._startAutoRefresh();
-        },
-
-        _startAutoRefresh: function () {
-            if (this._refreshTimer) { clearInterval(this._refreshTimer); }
-            this._refreshTimer = setInterval(function () {
-                this.loadData();
-            }.bind(this), 15000);
         },
 
         loadData: function () {
@@ -49,13 +39,36 @@ sap.ui.define([
             oModel.setProperty("/busy", true);
             oModel.setProperty("/hasError", false);
 
+            console.log("──────────────────────────────────────────────");
+            console.log("[fetch] GET /odata/v4/tally/Syncs?$orderby=pushedAt desc&$top=1");
+            console.log("[fetch] GET /odata/v4/tally/Ledgers");
+            console.log("[fetch] GET /odata/v4/tally/Vouchers");
+            console.log("[fetch] GET /odata/v4/tally/StockItems");
+            console.log("──────────────────────────────────────────────");
+
             Promise.all([
-                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=1").then(function (r) { return r.json(); }),
-                fetch(CAP_URL + "/Ledgers").then(function (r) { return r.json(); })
+                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=1").then(function (r) {
+                    console.log("[response] Syncs →", r.status, r.statusText);
+                    return r.json();
+                }),
+                fetch(CAP_URL + "/Ledgers").then(function (r) {
+                    console.log("[response] Ledgers →", r.status, r.statusText);
+                    return r.json();
+                }),
+                fetch(CAP_URL + "/Vouchers").then(function (r) {
+                    console.log("[response] Vouchers →", r.status, r.statusText);
+                    return r.json();
+                }),
+                fetch(CAP_URL + "/StockItems").then(function (r) {
+                    console.log("[response] StockItems →", r.status, r.statusText);
+                    return r.json();
+                })
             ])
             .then(function (results) {
                 var syncs = results[0].value || [];
                 var ledgers = results[1].value || [];
+                var vouchers = results[2].value || [];
+                var stockItems = results[3].value || [];
                 var latest = syncs[0] || {};
 
                 oModel.setProperty("/company",      latest.company      || "—");
@@ -77,13 +90,22 @@ sap.ui.define([
                     totalBalance: latest.totalBalance || 0
                 });
 
-                oModel.setProperty("/data", ledgers);
-                oModel.setProperty("/totalRecords", ledgers.length);
+                console.log("[data] Ledgers:", ledgers.length, "records");
+                console.log("[data] Vouchers:", vouchers.length, "records");
+                console.log("[data] StockItems:", stockItems.length, "records");
+                if (ledgers.length > 0) console.log("[data] First ledger:", ledgers[0].name, "| ₹" + ledgers[0].closingBalance);
+                if (vouchers.length > 0) console.log("[data] First voucher:", vouchers[0].partyName, "|", vouchers[0].voucherType, "| ₹" + vouchers[0].netAmount);
+                if (stockItems.length > 0) console.log("[data] First stock item:", stockItems[0].stockName);
+
+                oModel.setProperty("/ledgers", ledgers);
+                oModel.setProperty("/vouchers", vouchers);
+                oModel.setProperty("/stockItems", stockItems);
+                oModel.setProperty("/totalRecords", ledgers.length + vouchers.length + stockItems.length);
                 oModel.setProperty("/lastRefreshed",
                     "Last refreshed: " + new Date().toLocaleTimeString("en-IN"));
                 oModel.setProperty("/busy", false);
 
-                MessageToast.show("Loaded " + ledgers.length + " records from CAP");
+                MessageToast.show("Loaded " + ledgers.length + " ledgers, " + vouchers.length + " vouchers, " + stockItems.length + " stock items");
             })
             .catch(function (e) {
                 console.log("[View1] loadData FAILED:", e.message);
@@ -93,22 +115,44 @@ sap.ui.define([
             });
         },
 
+        onTabSelect: function (oEvent) {
+            var key = oEvent.getParameter("key");
+            this.getView().getModel().setProperty("/tab", key);
+            this._clearSearch();
+        },
+
+        _clearSearch: function () {
+            var oSearch = this.byId("searchField");
+            if (oSearch) { oSearch.setValue(""); }
+            var tab = this.getView().getModel().getProperty("/tab");
+            var table = tab === TABS.LEDGERS ? "ledgerTable"
+                      : tab === TABS.VOUCHERS ? "voucherTable"
+                      : "stockTable";
+            var oTable = this.byId(table);
+            if (oTable && oTable.getBinding("items")) {
+                oTable.getBinding("items").filter([]);
+            }
+        },
+
         onSearch: function (oEvent) {
-            var sQuery   = oEvent.getSource().getValue().trim();
-            var oBinding = this.byId("ledgerTable").getBinding("items");
+            var sQuery = oEvent.getSource().getValue().trim();
+            var tab = this.getView().getModel().getProperty("/tab");
+            var tableId = tab === TABS.LEDGERS ? "ledgerTable"
+                        : tab === TABS.VOUCHERS ? "voucherTable"
+                        : "stockTable";
+            var oBinding = this.byId(tableId).getBinding("items");
             if (!oBinding) { return; }
+
+            var filterField = tab === TABS.LEDGERS ? "name"
+                            : tab === TABS.VOUCHERS ? "partyName"
+                            : "stockName";
             oBinding.filter(sQuery
-                ? [new Filter("name", FilterOperator.Contains, sQuery)]
+                ? [new Filter(filterField, FilterOperator.Contains, sQuery)]
                 : []);
         },
 
         onRefresh: function () {
-            var oSearch = this.byId("searchField");
-            if (oSearch) { oSearch.setValue(""); }
-            var oTable = this.byId("ledgerTable");
-            if (oTable && oTable.getBinding("items")) {
-                oTable.getBinding("items").filter([]);
-            }
+            this._clearSearch();
             this.loadData();
         },
 
@@ -135,6 +179,15 @@ sap.ui.define([
                 currency:              "INR",
                 maximumFractionDigits: 0
             }).format(v);
+        },
+
+        formatDate: function (v) {
+            if (!v) { return "—"; }
+            return new Date(v).toLocaleDateString("en-IN", { dateStyle: "medium" });
+        },
+
+        formatBool: function (v) {
+            return v ? "Yes" : "No";
         }
     });
 });

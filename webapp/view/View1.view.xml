@@ -5,33 +5,14 @@
     xmlns:core="sap.ui.core"
     displayBlock="true">
 
-    <!--
-    ╔══════════════════════════════════════════════════════════════════════════╗
-      View1.view.xml — TALLY LEDGER DASHBOARD
-
-      CRITICAL FIXES:
-      ✅ FIX 1 (previous): Removed <footer> from sap.m.Table
-         → sap.m.Table has NO footer aggregation
-      ✅ FIX 2 (this file): Removed <footer> from sap.m.Panel
-         → sap.m.Panel ALSO has NO footer aggregation
-         → Both caused UI5 to try loading nonexistent 'sap/m/footer.js'
-         → Script load error → TargetView1 routing target failed → blank screen
-      ✅ FIX 3: Table status bar now uses a plain <Toolbar> inside
-         the Panel content area, after the Table — fully supported
-    ╚══════════════════════════════════════════════════════════════════════════╝
-    -->
-
     <Page
         id="dashboardPage"
-        title="Tally Ledger Dashboard"
+        title="Tally Intelligence Dashboard"
         busy="{/busy}"
         busyIndicatorDelay="0"
         showHeader="true"
         backgroundDesign="List">
 
-        <!-- ═══════════════════════════════════════════════════════════════
-             TOP APP BAR
-             ═══════════════════════════════════════════════════════════════ -->
         <customHeader>
             <Bar>
                 <contentLeft>
@@ -41,7 +22,7 @@
                         color="#0070F2"
                         class="sapUiSmallMarginEnd"/>
                     <Title
-                        text="Tally Ledger Intelligence"
+                        text="Tally Intelligence Dashboard"
                         level="H2"
                         titleStyle="H4"/>
                 </contentLeft>
@@ -56,16 +37,13 @@
                         icon="sap-icon://refresh"
                         type="Emphasized"
                         press=".onRefresh"
-                        tooltip="Refresh from CAP"/>
+                        tooltip="Refresh all data"/>
                 </contentRight>
             </Bar>
         </customHeader>
 
         <content>
 
-            <!-- ═══════════════════════════════════════════════════════════
-                 SECTION 1 — DATA SOURCE HEADER
-                 ═══════════════════════════════════════════════════════════ -->
             <Panel
                 id="headerPanel"
                 backgroundDesign="Solid"
@@ -83,13 +61,13 @@
                             titleStyle="H5"/>
                         <ToolbarSpacer/>
                         <ObjectStatus
-                            text="LIVE \u00B7 15s"
+                            text="Manual Refresh"
                             state="Success"
                             icon="sap-icon://connected"
                             inverted="true"/>
                     </Toolbar>
                 </headerToolbar>
-                
+
                 <HBox
                     wrap="Wrap"
                     justifyContent="SpaceBetween"
@@ -98,336 +76,234 @@
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
                         <Label text="Company" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/company}"
-                            state="Information"
-                            icon="sap-icon://home"/>
-                    </VBox>
-
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Data Type" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/dataType}"
-                            state="None"
-                            icon="sap-icon://database"/>
+                        <ObjectStatus text="{/company}" state="Information" icon="sap-icon://home"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
                         <Label text="Last Sync" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/timestamp}"
-                            state="None"
-                            icon="sap-icon://appointment-2"/>
+                        <ObjectStatus text="{/timestamp}" state="None" icon="sap-icon://appointment-2"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginBottom">
                         <Label text="Total Records" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/totalRecords}"
-                            state="Success"
-                            icon="sap-icon://list"/>
-                    </VBox>
-
-                    <VBox class="sapUiSmallMarginBottom">
-                        <Label text="Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/syncId}"
-                            state="None"
-                            icon="sap-icon://identifier"/>
+                        <ObjectStatus text="{/totalRecords}" state="Success" icon="sap-icon://list"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginBottom">
                         <Label text="CPI Message ID" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/cpiMessageId}"
-                            state="None"
-                            icon="sap-icon://message-id"/>
+                        <ObjectStatus text="{/cpiMessageId}" state="None" icon="sap-icon://message-id"/>
                     </VBox>
-
-                    <VBox class="sapUiSmallMarginBottom">
-                        <Label text="Sync Timestamp" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus
-                            text="{/timestamp}"
-                            state="None"
-                            icon="sap-icon://appointment-2"/>
-                    </VBox>
-
                 </HBox>
             </Panel>
 
-            <!-- ═══════════════════════════════════════════════════════════
-                 SECTION 2 — KPI TILES
-                 ═══════════════════════════════════════════════════════════ -->
-            <Panel
-                id="kpiPanel"
-                backgroundDesign="Transparent"
-                class="sapUiSmallMarginBeginEnd">
+            <IconTabBar
+                id="tabBar"
+                class="sapUiSmallMarginBeginEnd"
+                select=".onTabSelect"
+                expanded="{device>/system/phone}"
+                selectedKey="{/tab}">
 
-                <headerToolbar>
-                    <Toolbar height="2.5rem">
-                        <core:Icon
-                            src="sap-icon://key-user-settings"
-                            size="1rem"
-                            class="sapUiSmallMarginEnd"/>
-                        <Title
-                            text="Key Performance Indicators"
-                            level="H3"
-                            titleStyle="H6"/>
-                    </Toolbar>
-                </headerToolbar>
+                <items>
+                    <IconTabFilter key="Ledgers" text="Ledgers" icon="sap-icon://ledger">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
+                                    <Title text="Ledger Register" level="H3" titleStyle="H6"/>
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="searchField"
+                                        placeholder="Search by ledger name…"
+                                        width="22rem"
+                                        liveChange=".onSearch"
+                                        search=".onSearch"
+                                        showRefreshButton="false"/>
+                                </Toolbar>
+                            </headerToolbar>
 
-                <TileContainer
-                    id="kpiTileContainer"
-                    editable="false">
+                            <Table
+                                id="ledgerTable"
+                                items="{path: '/ledgers'}"
+                                growing="true"
+                                growingThreshold="10"
+                                alternateRowColors="true"
+                                sticky="ColumnHeaders"
+                                noDataText="No ledger records found."
+                                mode="None">
 
-                    <StandardTile
-                        title="Total Ledgers"
-                        number="{/summary/totalLedgers}"
-                        numberUnit="Ledgers"
-                        icon="sap-icon://ledger"
-                        type="Monitor"
-                        infoState="Success"
-                        info="All accounts"/>
+                                <columns>
+                                    <Column width="20%"><Text text="Ledger Name"/></Column>
+                                    <Column width="18%"><Text text="Parent Group"/></Column>
+                                    <Column width="10%" hAlign="Center"><Text text="Type"/></Column>
+                                    <Column width="14%" hAlign="End"><Text text="Opening Balance"/></Column>
+                                    <Column width="14%" hAlign="End"><Text text="Closing Balance"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Currency"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Country"/></Column>
+                                </columns>
 
-                    <StandardTile
-                        title="Party Ledgers"
-                        number="{/summary/partyLedgers}"
-                        numberUnit="Parties"
-                        icon="sap-icon://group"
-                        type="Monitor"
-                        infoState="Warning"
-                        info="Vendor / Customer"/>
+                                <items>
+                                    <ColumnListItem
+                                        type="Active"
+                                        highlight="{path: 'closingBalance', formatter: '.formatBalanceState'}">
+                                        <ObjectIdentifier title="{name}" titleActive="false"/>
+                                        <Text text="{parentGroup}" wrapping="false"/>
+                                        <Label text="{type}" design="Bold" wrapping="false"/>
+                                        <ObjectNumber number="{path: 'openingBalance', formatter: '.formatBalance'}" state="None"/>
+                                        <ObjectNumber number="{path: 'closingBalance', formatter: '.formatBalance'}" state="{path: 'closingBalance', formatter: '.formatBalanceState'}" emphasized="true"/>
+                                        <Text text="{currency}" wrapping="false"/>
+                                        <HBox alignItems="Center" justifyContent="Center">
+                                            <core:Icon src="sap-icon://world" tooltip="{countryCode}" color="#0070F2" class="sapUiTinyMarginEnd"/>
+                                            <Text text="{countryCode}" wrapping="false"/>
+                                        </HBox>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
 
-                    <StandardTile
-                        title="With GSTIN"
-                        number="{/summary/withGstin}"
-                        numberUnit="Entries"
-                        icon="sap-icon://official-service"
-                        type="Monitor"
-                        infoState="Information"
-                        info="GST Registered"/>
+                            <Toolbar height="2.5rem">
+                                <core:Icon src="sap-icon://connected" color="#107E3E" class="sapUiSmallMarginEnd"/>
+                                <Label text="Ledgers"/>
+                                <ToolbarSpacer/>
+                                <Label text="{= ${/ledgers}.length + ' records'}" design="Bold"/>
+                            </Toolbar>
+                        </Panel>
+                    </IconTabFilter>
 
-                    <StandardTile
-                        title="With Email"
-                        number="{/summary/withEmail}"
-                        numberUnit="Entries"
-                        icon="sap-icon://email"
-                        type="Monitor"
-                        infoState="Information"
-                        info="Email on record"/>
+                    <IconTabFilter key="Vouchers" text="Vouchers" icon="sap-icon://receipt">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
+                                    <Title text="Voucher Register" level="H3" titleStyle="H6"/>
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="voucherSearchField"
+                                        placeholder="Search by party name…"
+                                        width="22rem"
+                                        liveChange=".onSearch"
+                                        search=".onSearch"
+                                        showRefreshButton="false"/>
+                                </Toolbar>
+                            </headerToolbar>
 
-                    <StandardTile
-                        title="Total Balance"
-                        number="{
-                            path: '/summary/totalBalance',
-                            formatter: '.formatTotalBalance'
-                        }"
-                        numberUnit="INR"
-                        icon="sap-icon://currency"
-                        type="Monitor"
-                        infoState="Success"
-                        info="Aggregate closing"/>
+                            <Table
+                                id="voucherTable"
+                                items="{path: '/vouchers'}"
+                                growing="true"
+                                growingThreshold="10"
+                                alternateRowColors="true"
+                                sticky="ColumnHeaders"
+                                noDataText="No voucher records found."
+                                mode="None">
 
-                </TileContainer>
-            </Panel>
+                                <columns>
+                                    <Column width="12%"><Text text="Date"/></Column>
+                                    <Column width="12%"><Text text="Voucher Type"/></Column>
+                                    <Column width="10%"><Text text="Voucher No"/></Column>
+                                    <Column width="14%"><Text text="Party Name"/></Column>
+                                    <Column width="14%"><Text text="Reference No"/></Column>
+                                    <Column width="18%"><Text text="Narration"/></Column>
+                                    <Column width="10%" hAlign="End"><Text text="Net Amount"/></Column>
+                                    <Column width="6%" hAlign="Center"><Text text="Invoice"/></Column>
+                                    <Column width="6%" hAlign="Center"><Text text="Lines"/></Column>
+                                </columns>
 
-            <!-- ═══════════════════════════════════════════════════════════
-                 SECTION 3 — LEDGER TABLE
-                 NOTE: NO <footer> on Panel or Table.
-                 The status bar is a plain <Toolbar> placed AFTER
-                 the <Table> inside the Panel's default content aggregation.
-                 sap.m.Panel content aggregation accepts any controls. ✅
-                 ═══════════════════════════════════════════════════════════ -->
-            <Panel
-                id="tablePanel"
-                backgroundDesign="Solid"
-                class="sapUiSmallMargin">
+                                <items>
+                                    <ColumnListItem type="Active">
+                                        <Text text="{path: 'voucherDate', formatter: '.formatDate'}" wrapping="false"/>
+                                        <Text text="{voucherType}" wrapping="false"/>
+                                        <Text text="{voucherNumber}" wrapping="false"/>
+                                        <ObjectIdentifier title="{partyName}" titleActive="false"/>
+                                        <Text text="{referenceNo}" wrapping="false"/>
+                                        <Text text="{narration}" wrapping="false" maxLines="1"/>
+                                        <ObjectNumber number="{path: 'netAmount', formatter: '.formatBalance'}" state="{path: 'netAmount', formatter: '.formatBalanceState'}" emphasized="true"/>
+                                        <Text text="{path: 'isInvoice', formatter: '.formatBool'}"/>
+                                        <Text text="{lineItemCount}"/>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
 
-                <headerToolbar>
-                    <Toolbar>
-                        <core:Icon
-                            src="sap-icon://table-chart"
-                            size="1rem"
-                            class="sapUiSmallMarginEnd"/>
-                        <Title
-                            text="Ledger Register"
-                            level="H3"
-                            titleStyle="H6"/>
-                        <ToolbarSpacer/>
-                        <SearchField
-                            id="searchField"
-                            placeholder="Search by ledger name…"
-                            width="22rem"
-                            liveChange=".onSearch"
-                            search=".onSearch"
-                            showRefreshButton="false"/>
-                    </Toolbar>
-                </headerToolbar>
+                            <Toolbar height="2.5rem">
+                                <core:Icon src="sap-icon://connected" color="#107E3E" class="sapUiSmallMarginEnd"/>
+                                <Label text="Vouchers"/>
+                                <ToolbarSpacer/>
+                                <Label text="{= ${/vouchers}.length + ' records'}" design="Bold"/>
+                            </Toolbar>
+                        </Panel>
+                    </IconTabFilter>
 
-                <!-- The Table — NO footer aggregation here -->
-                <Table
-                    id="ledgerTable"
-                    items="{path: '/data'}"
-                    growing="true"
-                    growingThreshold="10"
-                    growingScrollToLoad="false"
-                    alternateRowColors="true"
-                    sticky="ColumnHeaders"
-                    noDataText="No ledger records found. Try refreshing or clearing the search."
-                    mode="None"
-                    popinLayout="GridSmall"
-                    contextualWidth="Auto">
+                    <IconTabFilter key="StockItems" text="Stock Items" icon="sap-icon://inventory">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
+                                    <Title text="Stock Register" level="H3" titleStyle="H6"/>
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="stockSearchField"
+                                        placeholder="Search by stock name…"
+                                        width="22rem"
+                                        liveChange=".onSearch"
+                                        search=".onSearch"
+                                        showRefreshButton="false"/>
+                                </Toolbar>
+                            </headerToolbar>
 
-                    <columns>
+                            <Table
+                                id="stockTable"
+                                items="{path: '/stockItems'}"
+                                growing="true"
+                                growingThreshold="10"
+                                alternateRowColors="true"
+                                sticky="ColumnHeaders"
+                                noDataText="No stock records found."
+                                mode="None">
 
-                        <Column
-                            width="20%"
-                            minScreenWidth="Small"
-                            demandPopin="false">
-                            <Text text="Ledger Name"/>
-                        </Column>
+                                <columns>
+                                    <Column width="20%"><Text text="Stock Name"/></Column>
+                                    <Column width="14%"><Text text="Category"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Rate"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Quantity"/></Column>
+                                    <Column width="10%"><Text text="Unit"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Amount"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Opening Stock"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Closing Stock"/></Column>
+                                </columns>
 
-                        <Column
-                            width="18%"
-                            minScreenWidth="Tablet"
-                            demandPopin="true"
-                            popinDisplay="Inline">
-                            <Text text="Parent Group"/>
-                        </Column>
+                                <items>
+                                    <ColumnListItem type="Active">
+                                        <ObjectIdentifier title="{stockName}" titleActive="false"/>
+                                        <Text text="{category}" wrapping="false"/>
+                                        <ObjectNumber number="{path: 'rate', formatter: '.formatBalance'}" state="None"/>
+                                        <Text text="{quantity}"/>
+                                        <Text text="{unit}" wrapping="false"/>
+                                        <ObjectNumber number="{path: 'amount', formatter: '.formatBalance'}" state="None"/>
+                                        <Text text="{openingStock}"/>
+                                        <Text text="{closingStock}"/>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
 
-                        <Column
-                            width="10%"
-                            minScreenWidth="Tablet"                                      
-                            demandPopin="true"
-                            popinDisplay="Inline"
-                            hAlign="Center">
-                            <Text text="Type"/>
-                        </Column>
-
-                        <Column
-                            width="14%"
-                            minScreenWidth="Desktop"
-                            demandPopin="true"
-                            popinDisplay="Inline"
-                            hAlign="End">
-                            <Text text="Opening Balance"/>
-                        </Column>
-
-                        <Column
-                            width="14%"
-                            minScreenWidth="Small"
-                            demandPopin="false"
-                            hAlign="End">
-                            <Text text="Closing Balance"/>
-                        </Column>
-
-                        <Column
-                            width="8%"
-                            minScreenWidth="Desktop"
-                            demandPopin="true"
-                            popinDisplay="Inline"
-                            hAlign="Center">
-                            <Text text="Currency"/>
-                        </Column>
-
-                        <Column
-                            width="8%"
-                            minScreenWidth="Desktop"
-                            demandPopin="true"
-                            popinDisplay="Inline"
-                            hAlign="Center">
-                            <Text text="Country"/>
-                        </Column>
-
-                    </columns>
-
-                    <items>
-                        <ColumnListItem
-                            type="Active"
-                            highlight="{
-                                path: 'closingBalance',
-                                formatter: '.formatBalanceState'
-                            }"
-                            highlightText="Balance state indicator">
-
-                            <ObjectIdentifier
-                                title="{name}"
-                                titleActive="false"/>
-
-                            <Text text="{parentGroup}" wrapping="false"/>
-
-                            <Label
-                                text="{type}"
-                                design="Bold"
-                                wrapping="false"/>
-
-                            <ObjectNumber
-                                number="{
-                                    path: 'openingBalance',
-                                    formatter: '.formatBalance'
-                                }"
-                                state="None"
-                                textAlign="End"/>
-
-                            <ObjectNumber
-                                number="{
-                                    path: 'closingBalance',
-                                    formatter: '.formatBalance'
-                                }"
-                                state="{
-                                    path: 'closingBalance',
-                                    formatter: '.formatBalanceState'
-                                }"
-                                emphasized="true"
-                                textAlign="End"/>
-
-                            <Text text="{currency}" wrapping="false"/>
-
-                            <HBox alignItems="Center" justifyContent="Center">
-                                <core:Icon
-                                    src="sap-icon://world"
-                                    tooltip="{countryCode}"
-                                    color="#0070F2"
-                                    class="sapUiTinyMarginEnd"/>
-                                <Text text="{countryCode}" wrapping="false"/>
-                            </HBox>
-
-                        </ColumnListItem>
-                    </items>
-
-                </Table>
-
-                <!-- Status bar: plain Toolbar in Panel content — fully valid ✅ -->
-                <Toolbar
-                    id="tableStatusBar"
-                    height="2.5rem">
-                    <core:Icon
-                        src="sap-icon://connected"
-                        color="#107E3E"
-                        class="sapUiSmallMarginEnd"/>
-                    <Label text="Live · Auto-refresh every 15s"/>
-                    <ToolbarSpacer/>
-                    <Label
-                        text="{= ${/totalRecords} + ' records \u00B7 ' + ${/company} + ' \u00B7 ' + ${/dataType}}"
-                        design="Bold"/>
-                </Toolbar>
-
-            </Panel>
+                            <Toolbar height="2.5rem">
+                                <core:Icon src="sap-icon://connected" color="#107E3E" class="sapUiSmallMarginEnd"/>
+                                <Label text="Stock Items"/>
+                                <ToolbarSpacer/>
+                                <Label text="{= ${/stockItems}.length + ' records'}" design="Bold"/>
+                            </Toolbar>
+                        </Panel>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
 
         </content>
 
-        <!-- Page footer — sap.m.Page DOES support footer aggregation ✅ -->
         <footer>
             <Bar design="Footer">
                 <contentLeft>
                     <core:Icon src="sap-icon://shield" color="#107E3E"/>
-                    <Label
-                        text="  Connected · CAP OData Service → Tally Database"
-                        design="Bold"
-                        class="sapUiSmallMarginBegin"/>
+                    <Label text="  Connected · Tally Backend Service" design="Bold" class="sapUiSmallMarginBegin"/>
                 </contentLeft>
                 <contentRight>
-                    <Label text="Fiori Ledger Dashboard · INR · India"/>
+                    <Label text="Tally Intelligence Dashboard · INR · India"/>
                 </contentRight>
             </Bar>
         </footer>

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { router } = require("./routes");
+const { router, odataRouter } = require("./routes");
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3003;
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use("/api", router);
+app.use("/odata", odataRouter);
 
 app.listen(PORT, () => {
     console.log("──────────────────────────────────────────────");

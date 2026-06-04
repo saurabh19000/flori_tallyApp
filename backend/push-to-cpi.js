@@ -195,7 +195,7 @@ function main() {
     var payload = JSON.parse(fs.readFileSync(dataFile, "utf8"));
 
     console.log("──────────────────────────────────────────────");
-    console.log("  Push to CAP (Tally Backend Service)");
+    console.log("  Push to CPI + Notify Backend");
     console.log("──────────────────────────────────────────────");
     console.log("  Data Type :", dataType);
     console.log("  Company   :", payload.company);
@@ -205,7 +205,7 @@ function main() {
     console.log("[1/3] Getting OAuth token from token-proxy...");
     getToken()
         .then(function (token) {
-            console.log("[2/3] Pushing data to CPI (to get real message ID)...");
+            console.log("[2/3] Pushing data to CPI...");
             return pushToCpi(token, payload);
         })
         .then(function (result) {
@@ -213,20 +213,26 @@ function main() {
             console.log("  CPI message ID:", result.cpiMessageId);
             var cpiMsgId = result.cpiMessageId;
 
-            console.log("[3/3] Pushing to CAP with CPI message ID...");
-            return pushToCap(payload, dataType, cpiMsgId);
+            console.log("[3/4] Pushing to CAP (if running)...");
+            return pushToCap(payload, dataType, cpiMsgId).catch(function () {
+                console.log("  CAP not available — skipping");
+                return { status: 0, body: "" };
+            }).then(function (capResult) {
+                return { cpiResult: result, capResult: capResult };
+            });
         })
-        .then(function (result) {
-            console.log("  CAP response:", result.status);
-            try {
-                var parsed = JSON.parse(result.body);
-                console.log("  Sync ID:", parsed.syncId);
-                console.log("  Records stored:", parsed.records);
-                console.log("");
-                console.log("✅ Done! Data stored in CAP database with real CPI message ID.");
-            } catch (e) {
-                console.log("  Raw:", result.body);
-            }
+        .then(function (results) {
+            var cpiMsgId = results.cpiResult.cpiMessageId;
+            var cpiDataStoreId = results.cpiResult.cpiDataStoreId;
+
+            console.log("[4/4] Notifying backend...");
+            return notifyBackend(cpiMsgId, payload, dataType, cpiDataStoreId);
+        })
+        .then(function (backendResult) {
+            console.log("  Backend response: versionId=", backendResult.versionId);
+            console.log("  Dashboard syncId:", backendResult.syncId);
+            console.log("");
+            console.log("✅ Done! Data stored and synced. Refresh your dashboard.");
         })
         .catch(function (err) {
             console.error("❌ Failed:", err.message);

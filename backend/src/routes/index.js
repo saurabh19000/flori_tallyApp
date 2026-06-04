@@ -1,10 +1,42 @@
 const { Router } = require("express");
 const http = require("http");
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const istTimestamp = require("../helpers/istTimestamp");
+
+const STORE_FILE = path.join(__dirname, "..", "..", "data", "store.json");
 
 let dataVersions = [];
 let versionCounter = 0;
+
+function loadStore() {
+    try {
+        if (fs.existsSync(STORE_FILE)) {
+            var raw = fs.readFileSync(STORE_FILE, "utf8");
+            var store = JSON.parse(raw);
+            dataVersions = store.dataVersions || [];
+            versionCounter = store.versionCounter || 0;
+            console.log("[store] Loaded " + dataVersions.length + " versions from " + STORE_FILE);
+        }
+    } catch (err) {
+        console.error("[store] Load error:", err.message);
+    }
+}
+
+function saveStore() {
+    try {
+        var dir = path.dirname(STORE_FILE);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(STORE_FILE, JSON.stringify({ dataVersions: dataVersions, versionCounter: versionCounter }, null, 2));
+    } catch (err) {
+        console.error("[store] Save error:", err.message);
+    }
+}
+
+loadStore();
 
 function addVersion(data) {
     versionCounter++;
@@ -31,6 +63,7 @@ function addVersion(data) {
         version.syncId = contentFingerprint(version);
     }
     dataVersions.push(version);
+    saveStore();
     console.log("[backend] Version " + version.id + " — " + version.company + " (" + version.totalRecords + " records) at " + version.timestamp);
     return version;
 }
@@ -56,7 +89,7 @@ function contentFingerprint(data) {
 
 function fetchFromCpi() {
     return new Promise(function (resolve, reject) {
-        var req = http.get("http://" + TOKEN_PROXY + "/api/read-tally", function (res) {
+        var req = http.get("http://" + TOKEN_PROXY + "/api/http/read-tally", function (res) {
             var data = "";
             var cpiStoreId = res.headers["sapdatastoreid"] || res.headers["sap_data_store_id"] || null;
             var cpiMsgLogId = res.headers["sap_messageprocessinglogid"] || null;
@@ -83,7 +116,7 @@ function fetchFromCpi() {
 
 function fetchFreshFromCpi() {
     return new Promise(function (resolve, reject) {
-        var req = http.get("http://" + TOKEN_PROXY + "/api/read-tally", function (res) {
+        var req = http.get("http://" + TOKEN_PROXY + "/api/http/read-tally", function (res) {
             var raw = "";
             res.on("data", function (chunk) { raw += chunk; });
             res.on("end", function () {
@@ -268,4 +301,108 @@ router.get("/health", function (_req, res) {
     });
 });
 
-module.exports = { router, addVersion, fetchFromCpi, dataVersions };
+// ── OData v4 endpoints (for Fiori frontend) ─────────────────────────────────
+
+const odataRouter = Router();
+
+odataRouter.get("/v4/tally/Syncs", function (req, res) {
+    var sorted = dataVersions.slice().sort(function (a, b) {
+        return b.timestamp.localeCompare(a.timestamp);
+    });
+    var top = parseInt(req.query.$top, 10) || sorted.length;
+    var result = sorted.slice(0, top).map(function (v) {
+        return {
+            company: v.company,
+            dataType: v.dataType,
+            cpiMessageId: v.cpiMessageId,
+            pushedAt: v.timestamp,
+            totalLedgers: v.summary.totalLedgers,
+            partyLedgers: v.summary.partyLedgers,
+            withGstin: v.summary.withGstin,
+            withEmail: v.summary.withEmail,
+            totalBalance: v.summary.totalBalance
+        };
+    });
+    res.json({ value: result });
+});
+
+odataRouter.get("/v4/tally/Ledgers", function (req, res) {
+    var seen = {};
+    var ledgers = [];
+    dataVersions.forEach(function (v) {
+        (v.data || []).forEach(function (d) {
+            if (!d.name || d.voucherDate || d.voucherNumber) return;
+            var key = d.name + "|" + (d.parentGroup || "");
+            if (!seen[key]) {
+                seen[key] = true;
+                ledgers.push({
+                    name: d.name,
+                    parentGroup: d.parentGroup,
+                    type: d.type,
+                    openingBalance: d.openingBalance,
+                    closingBalance: d.closingBalance,
+                    currency: d.currency || "INR",
+                    countryCode: d.countryCode || "IN"
+                });
+            }
+        });
+    });
+    res.json({ value: ledgers });
+});
+
+odataRouter.get("/v4/tally/Vouchers", function (req, res) {
+    var seen = {};
+    var vouchers = [];
+    dataVersions.forEach(function (v) {
+        (v.data || []).forEach(function (d) {
+            if (!d.voucherDate && !d.partyName) return;
+            var key = d.guid || (d.voucherNumber + "|" + d.partyName);
+            if (!seen[key]) {
+                seen[key] = true;
+                vouchers.push({
+                    guid: d.guid,
+                    voucherDate: d.voucherDate,
+                    voucherType: d.voucherType,
+                    voucherNumber: d.voucherNumber,
+                    referenceNo: d.referenceNo,
+                    partyName: d.partyName,
+                    narration: d.narration,
+                    netAmount: d.netAmount,
+                    lineItemCount: d.lineItemCount,
+                    isInvoice: d.isInvoice,
+                    isOptional: d.isOptional,
+                    isPostDated: d.isPostDated
+                });
+            }
+        });
+    });
+    res.json({ value: vouchers });
+});
+
+odataRouter.get("/v4/tally/StockItems", function (req, res) {
+    var seen = {};
+    var items = [];
+    dataVersions.forEach(function (v) {
+        (v.data || []).forEach(function (d) {
+            if (!d.stockName && !d.rate && !d.quantity) return;
+            var key = d.guid || d.stockName || JSON.stringify(d);
+            if (!seen[key]) {
+                seen[key] = true;
+                items.push({
+                    guid: d.guid,
+                    stockName: d.stockName,
+                    category: d.category,
+                    rate: d.rate,
+                    quantity: d.quantity,
+                    unit: d.unit,
+                    amount: d.amount,
+                    openingStock: d.openingStock,
+                    closingStock: d.closingStock
+                });
+            }
+        });
+    });
+    res.json({ value: items });
+});
+
+module.exports = { router, odataRouter, addVersion, fetchFromCpi, dataVersions };

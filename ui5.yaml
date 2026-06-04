@@ -21,7 +21,7 @@ server:
           - path: /api
             url: http://localhost:3003
           - path: /odata
-            url: http://localhost:4004
+            url: http://localhost:3003
 
     - name: fiori-tools-appreload
       afterMiddleware: compression
