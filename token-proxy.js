@@ -150,18 +150,24 @@ function fetchToken() {
 // ── CPI API proxy ─────────────────────────────────────────────────────────────
 const CPI_API_BASE_HOST = new URL(CPI_API_BASE).hostname;
 
-function proxyApiRequest(apiPath, res) {
+function proxyApiRequest(apiPath, res, extraHeaders) {
     fetchToken()
     .then(function (token) {
+        const headers = {
+            "Authorization":  "Bearer " + token.access_token,
+            "Accept":         "application/json"
+        };
+        if (extraHeaders) {
+            Object.keys(extraHeaders).forEach(function (k) {
+                headers[k] = extraHeaders[k];
+            });
+        }
         const options = {
             hostname: CPI_API_BASE_HOST,
             port:     443,
             path:     apiPath,
             method:   "GET",
-            headers:  {
-                "Authorization":  "Bearer " + token.access_token,
-                "Accept":         "application/json"
-            }
+            headers:  headers
         };
 
         const req = https.request(options, function (cpiRes) {
@@ -223,9 +229,19 @@ async function startServer() {
 
         // ── Route: /api/*  (proxy to CPI with Bearer token) ──
         if (req.url.startsWith("/api/")) {
-            const apiPath = req.url.replace(/^\/api/, "");
+            const parsedUrl = new URL(req.url, "http://localhost");
+            const storeId = parsedUrl.searchParams.get("storeId") || null;
+            parsedUrl.searchParams.delete("storeId");
+            const apiPath = parsedUrl.pathname.replace(/^\/api/, "") + parsedUrl.search;
+
+            const extraHeaders = {};
+            if (storeId) {
+                extraHeaders["SapDataStoreId"] = storeId;
+                console.log("[proxy] Using data store entry ID:", storeId);
+            }
+
             console.log("[proxy] Proxying to CPI:", apiPath);
-            return proxyApiRequest(apiPath, res);
+            return proxyApiRequest(apiPath, res, extraHeaders);
         }
 
         res.writeHead(404, { "Content-Type": "application/json" });

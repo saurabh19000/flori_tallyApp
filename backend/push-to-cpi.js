@@ -211,6 +211,7 @@ function main() {
         .then(function (result) {
             console.log("  CPI response:", result.status);
             console.log("  CPI message ID:", result.cpiMessageId);
+            console.log("  CPI Data Store ID:", result.cpiDataStoreId || "(none)");
             var cpiMsgId = result.cpiMessageId;
 
             console.log("[3/4] Pushing to CAP (if running)...");

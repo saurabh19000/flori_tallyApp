@@ -87,9 +87,13 @@ function contentFingerprint(data) {
     return crypto.createHash("sha256").update(JSON.stringify(stable)).digest("hex").substring(0, 12);
 }
 
-function fetchFromCpi() {
+function fetchFromCpi(dataStoreId) {
     return new Promise(function (resolve, reject) {
-        var req = http.get("http://" + TOKEN_PROXY + "/api/http/read-tally", function (res) {
+        var url = "http://" + TOKEN_PROXY + "/api/http/read-tally";
+        if (dataStoreId) {
+            url += "?storeId=" + encodeURIComponent(dataStoreId);
+        }
+        var req = http.get(url, function (res) {
             var data = "";
             var cpiStoreId = res.headers["sapdatastoreid"] || res.headers["sap_data_store_id"] || null;
             var cpiMsgLogId = res.headers["sap_messageprocessinglogid"] || null;
@@ -114,9 +118,13 @@ function fetchFromCpi() {
     });
 }
 
-function fetchFreshFromCpi() {
+function fetchFreshFromCpi(dataStoreId) {
     return new Promise(function (resolve, reject) {
-        var req = http.get("http://" + TOKEN_PROXY + "/api/http/read-tally", function (res) {
+        var url = "http://" + TOKEN_PROXY + "/api/http/read-tally";
+        if (dataStoreId) {
+            url += "?storeId=" + encodeURIComponent(dataStoreId);
+        }
+        var req = http.get(url, function (res) {
             var raw = "";
             res.on("data", function (chunk) { raw += chunk; });
             res.on("end", function () {
@@ -178,7 +186,10 @@ router.get("/http/read-tally", function (req, res) {
     if (dataVersions.length > 0) {
         return res.json(dataVersions[dataVersions.length - 1]);
     }
-    fetchFromCpi()
+    var latestStoreId = dataVersions.length > 0
+        ? dataVersions[dataVersions.length - 1].cpiDataStoreId
+        : null;
+    fetchFromCpi(latestStoreId)
         .then(function (data) {
             addVersion(data);
             res.json(dataVersions[dataVersions.length - 1]);
@@ -193,7 +204,11 @@ router.get("/http/read-tally", function (req, res) {
 });
 
 router.get("/http/read-tally/fresh", function (_req, res) {
-    fetchFreshFromCpi()
+    var latestStoreId = dataVersions.length > 0
+        ? dataVersions[dataVersions.length - 1].cpiDataStoreId
+        : null;
+
+    fetchFreshFromCpi(latestStoreId)
         .then(function (result) {
             var body = result.body;
             var meta = result.meta;
@@ -210,22 +225,38 @@ router.get("/http/read-tally/fresh", function (_req, res) {
                 });
             }
 
-            // CPI has no data — no fallback, show empty
-            console.log("[backend] CPI returned no data");
-            res.json({
-                fromCpi: true,
-                meta:   meta,
-                body:   { company: null, dataType: null, syncId: null, timestamp: null, totalRecords: 0, summary: {}, data: [] },
-                syncId: null,
-                totalRecords: 0,
-                timestamp: null
-            });
+            // CPI has no data — fall back to local store
+            console.log("[backend] CPI returned no data, falling back to local store");
+            fallbackToLocal(res);
         })
         .catch(function (err) {
-            console.error("[backend] Fresh fetch failed:", err.message);
-            res.status(502).json({ error: "CPI fetch failed: " + err.message });
+            console.error("[backend] Fresh fetch failed:", err.message, "- falling back to local store");
+            fallbackToLocal(res);
         });
 });
+
+function fallbackToLocal(res) {
+    if (dataVersions.length > 0) {
+        var latest = dataVersions[dataVersions.length - 1];
+        res.json({
+            fromCpi: false,
+            meta:   { cpiMessageId: latest.cpiMessageId, cpiDataStoreId: latest.cpiDataStoreId },
+            body:   latest,
+            syncId: latest.syncId,
+            totalRecords: latest.totalRecords,
+            timestamp:    latest.timestamp
+        });
+    } else {
+        res.json({
+            fromCpi: false,
+            meta:   {},
+            body:   { company: null, dataType: null, syncId: null, timestamp: null, totalRecords: 0, summary: {}, data: [] },
+            syncId: null,
+            totalRecords: 0,
+            timestamp: null
+        });
+    }
+}
 
 router.post("/ingest", function (req, res) {
     // Accepts data payload with CPI metadata from external middleware
@@ -306,7 +337,10 @@ router.get("/health", function (_req, res) {
 const odataRouter = Router();
 
 odataRouter.get("/v4/tally/Syncs", function (req, res) {
-    var sorted = dataVersions.slice().sort(function (a, b) {
+    var ledgerVersions = dataVersions.filter(function (v) {
+        return v.data && v.data.some(function (d) { return d.name && !d.voucherDate; });
+    });
+    var sorted = ledgerVersions.slice().sort(function (a, b) {
         return b.timestamp.localeCompare(a.timestamp);
     });
     var top = parseInt(req.query.$top, 10) || sorted.length;

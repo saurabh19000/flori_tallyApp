@@ -12,9 +12,16 @@ def Message processData(Message message) {
     def entries = []
     def xml = new groovy.util.XmlSlurper().parseText(body)
 
-    xml.entry.each { entry ->
-        def val = entry.value?.text()
-        if (val) entries.add(val)
+    if (xml.name() == 'messages') {
+        xml.message.each { msg ->
+            def val = msg.text()
+            if (val) entries.add(val)
+        }
+    } else {
+        xml.entry.each { entry ->
+            def val = entry.value?.text()
+            if (val) entries.add(val)
+        }
     }
 
     message.setBody("[" + entries.join(",") + "]")
