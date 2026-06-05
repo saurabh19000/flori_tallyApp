@@ -48,20 +48,16 @@ sap.ui.define([
             console.log("──────────────────────────────────────────────");
 
             Promise.all([
-                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=20").then(function (r) {
-                    console.log("[response] Syncs →", r.status, r.statusText);
+                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=50").then(function (r) {
                     return r.json();
                 }),
                 fetch(CAP_URL + "/Ledgers").then(function (r) {
-                    console.log("[response] Ledgers →", r.status, r.statusText);
                     return r.json();
                 }),
                 fetch(CAP_URL + "/Vouchers").then(function (r) {
-                    console.log("[response] Vouchers →", r.status, r.statusText);
                     return r.json();
                 }),
                 fetch(CAP_URL + "/StockItems").then(function (r) {
-                    console.log("[response] StockItems →", r.status, r.statusText);
                     return r.json();
                 })
             ])
@@ -72,11 +68,16 @@ sap.ui.define([
                 var stockItems = results[3].value || [];
                 var latest = syncs[0] || {};
 
+                // Update Master Model with ALL data
                 oModel.setProperty("/syncs",        syncs);
+                oModel.setProperty("/ledgers",      ledgers);
+                oModel.setProperty("/vouchers",     vouchers);
+                oModel.setProperty("/stockItems",   stockItems);
+
+                // Update Latest Sync Context
                 oModel.setProperty("/company",      latest.company      || "—");
                 oModel.setProperty("/dataType",     latest.dataType     || "—");
-                oModel.setProperty("/syncId",       latest.cpiMessageId || "—");
-                oModel.setProperty("/cpiMessageId", latest.cpiMessageId || "—");
+                oModel.setProperty("/syncId",       latest.syncId       || "—");
                 oModel.setProperty("/timestamp", latest.pushedAt
                     ? new Date(latest.pushedAt).toLocaleString("en-IN", {
                           dateStyle: "medium",
@@ -84,30 +85,25 @@ sap.ui.define([
                       })
                     : "—");
 
-                oModel.setProperty("/summary", {
-                    totalLedgers: latest.totalLedgers || 0,
-                    partyLedgers: latest.partyLedgers || 0,
-                    withGstin:    latest.withGstin    || 0,
-                    withEmail:    latest.withEmail    || 0,
-                    totalBalance: latest.totalBalance || 0
-                });
+                // Calculate Global System Statistics
+                oModel.setProperty("/totalLedgers",    ledgers.length);
+                oModel.setProperty("/totalVouchers",   vouchers.length);
+                oModel.setProperty("/totalStockItems", stockItems.length);
+                oModel.setProperty("/totalRecords",    ledgers.length + vouchers.length + stockItems.length);
 
-                console.log("[data] Ledgers:", ledgers.length, "records");
-                console.log("[data] Vouchers:", vouchers.length, "records");
-                console.log("[data] StockItems:", stockItems.length, "records");
-                if (ledgers.length > 0) console.log("[data] First ledger:", ledgers[0].name, "| ₹" + ledgers[0].closingBalance);
-                if (vouchers.length > 0) console.log("[data] First voucher:", vouchers[0].partyName, "|", vouchers[0].voucherType, "| ₹" + vouchers[0].netAmount);
-                if (stockItems.length > 0) console.log("[data] First stock item:", stockItems[0].stockName);
-
-                oModel.setProperty("/ledgers", ledgers);
-                oModel.setProperty("/vouchers", vouchers);
-                oModel.setProperty("/stockItems", stockItems);
-                oModel.setProperty("/totalRecords", ledgers.length + vouchers.length + stockItems.length);
                 oModel.setProperty("/lastRefreshed",
                     "Last refreshed: " + new Date().toLocaleTimeString("en-IN"));
                 oModel.setProperty("/busy", false);
 
-                MessageToast.show("Loaded " + ledgers.length + " ledgers, " + vouchers.length + " vouchers, " + stockItems.length + " stock items");
+                console.log("[debug] All Fetched Data:", {
+                    ledgers: ledgers,
+                    vouchers: vouchers,
+                    stockItems: stockItems,
+                    syncHistory: syncs
+                });
+
+                console.log("[ui] Data loaded. Ledgers:", ledgers.length, "| Vouchers:", vouchers.length, "| Syncs:", syncs.length);
+                MessageToast.show("Dashboard Updated: " + (ledgers.length + vouchers.length) + " total system records.");
             })
             .catch(function (e) {
                 console.log("[View1] loadData FAILED:", e.message);
@@ -161,27 +157,97 @@ sap.ui.define([
             this.loadData();
         },
 
+        onViewDetails: function (oEvent) {
+            var oItem = oEvent.getSource().getBindingContext().getObject();
+            var aDetails = [];
+
+            // Dynamically scan for ALL keys in the record
+            Object.keys(oItem).forEach(function (key) {
+                // Ignore internal UI5/Sync metadata that isn't business data
+                if (key === "__metadata" || key === "syncId" || key === "syncDate") return;
+                
+                var value = oItem[key];
+                if (value === null || value === undefined) value = "—";
+                
+                aDetails.push({
+                    label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'), // CamelCase to Title Case
+                    value: value.toString()
+                });
+            });
+
+            if (!this._oDetailsDialog) {
+                this._oDetailsDialog = new sap.m.Dialog({
+                    title: "Full Record Inspector",
+                    contentWidth: "450px",
+                    contentHeight: "500px",
+                    resizable: true,
+                    draggable: true,
+                    content: new sap.m.List({
+                        items: {
+                            path: "details>/",
+                            template: new sap.m.DisplayListItem({
+                                label: "{details>label}",
+                                value: "{details>value}"
+                            })
+                        }
+                    }),
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            this._oDetailsDialog.close();
+                        }.bind(this)
+                    })
+                });
+                this.getView().addDependent(this._oDetailsDialog);
+            }
+
+            var oDetailsModel = new JSONModel(aDetails);
+            this._oDetailsDialog.setModel(oDetailsModel, "details");
+            this._oDetailsDialog.open();
+        },
+
         onFetchBtp: function () {
             var that = this;
             var oModel = this.getView().getModel();
 
-            oModel.setProperty("/busy", true);
-            MessageToast.show("Starting manual fetch from SAP BTP...");
+            if (!this._oBusyDialog) {
+                this._oBusyDialog = new sap.m.BusyDialog({
+                    title: "BTP System Sync",
+                    text: "Connecting to SAP BTP..."
+                });
+                this.getView().addDependent(this._oBusyDialog);
+            }
+
+            this._oBusyDialog.setText("Connecting to SAP BTP...");
+            this._oBusyDialog.open();
+
+            // Production Delay to ensure accuracy and visual feedback
+            var wait = function (ms) { return new Promise(resolve => setTimeout(resolve, ms)); };
 
             fetch("/api/sync/btp-fetch", { method: "POST" })
                 .then(function (r) {
-                    var contentType = r.headers.get("content-type");
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        return r.json();
-                    } else {
-                        throw new Error("Server returned non-JSON response. Please ensure backend is running.");
-                    }
+                    if (!r.ok) throw new Error("HTTP Error " + r.status);
+                    return r.json();
                 })
                 .then(function (result) {
-                    oModel.setProperty("/busy", false);
+                    return wait(800).then(function () {
+                        that._oBusyDialog.setText("Verifying data integrity...");
+                        return wait(1200).then(function () { return result; });
+                    });
+                })
+                .then(function (result) {
+                    that._oBusyDialog.close();
+                    
                     if (result.success) {
-                        MessageBox.success("Fetch Completed!\n\nTotal records found: " + result.totalFound + "\nNew versions added: " + result.newVersions);
-                        that.loadData();
+                        if (result.newVersions > 0) {
+                            MessageBox.success(result.message);
+                            // AUTOMATIC UI REFRESH
+                            that.loadData();
+                        } else {
+                            MessageToast.show(result.message);
+                            // Refresh anyway to ensure header stats are latest
+                            that.loadData();
+                        }
                     } else {
                         var msg = result.error + ": " + (result.details || "");
                         if (result.tip) { msg += "\n\nTip: " + result.tip; }
@@ -189,8 +255,8 @@ sap.ui.define([
                     }
                 })
                 .catch(function (e) {
-                    oModel.setProperty("/busy", false);
-                    MessageBox.error("Fetch Error: " + e.message);
+                    that._oBusyDialog.close();
+                    MessageBox.error("Verification Failed: " + e.message);
                 });
         },
 

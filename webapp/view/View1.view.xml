@@ -83,22 +83,32 @@
                     class="sapUiSmallMargin">
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Company" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <Label text="Latest Sync Company" design="Bold" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/company}" state="Information" icon="sap-icon://home"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Last Sync Date" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/timestamp}" state="None" icon="sap-icon://appointment-2"/>
+                        <Label text="Ledgers" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/totalLedgers}" state="Success" icon="sap-icon://ledger"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Vouchers" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/totalVouchers}" state="Warning" icon="sap-icon://receipt"/>
+                    </VBox>
+
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Stock Items" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/totalStockItems}" state="Error" icon="sap-icon://product"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
                         <Label text="Total System Records" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/totalRecords}" state="Warning" icon="sap-icon://database"/>
+                        <ObjectStatus text="{/totalRecords}" state="None" icon="sap-icon://database"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginBottom">
-                        <Label text="Current Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <Label text="Latest Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/syncId}" state="None" icon="sap-icon://message-id"/>
                     </VBox>
                 </HBox>
@@ -112,6 +122,56 @@
                 selectedKey="{/tab}">
 
                 <items>
+                    <IconTabFilter key="SyncHistory" text="Sync History" icon="sap-icon://history">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <core:Icon src="sap-icon://list" size="1rem" class="sapUiSmallMarginEnd"/>
+                                    <Title text="BTP Synchronization History" level="H3" titleStyle="H6"/>
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="syncSearchField"
+                                        placeholder="Search by Sync ID…"
+                                        width="20rem"
+                                        liveChange=".onSearch"
+                                        search=".onSearch"
+                                        showRefreshButton="false"/>
+                                </Toolbar>
+                            </headerToolbar>
+
+                            <Table
+                                id="syncTable"
+                                items="{path: '/syncs'}"
+                                growing="true"
+                                growingThreshold="10"
+                                alternateRowColors="true"
+                                sticky="ColumnHeaders"
+                                noDataText="No synchronization history found."
+                                mode="None">
+
+                                <columns>
+                                    <Column width="15%"><Text text="Version ID"/></Column>
+                                    <Column width="30%"><Text text="Sync ID (BTP)"/></Column>
+                                    <Column width="15%"><Text text="Company"/></Column>
+                                    <Column width="15%"><Text text="Data Type"/></Column>
+                                    <Column width="10%" hAlign="End"><Text text="Records"/></Column>
+                                    <Column width="15%" hAlign="Center"><Text text="Pushed At"/></Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem type="Active">
+                                        <Text text="Version {versionId}" design="Bold"/>
+                                        <Text text="{syncId}" wrapping="false"/>
+                                        <ObjectStatus text="{company}" state="Information"/>
+                                        <Label text="{dataType}" design="Bold"/>
+                                        <ObjectNumber number="{totalRecords}" unit="docs" state="Success"/>
+                                        <Text text="{path: 'pushedAt', formatter: '.formatDate'}"/>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </Panel>
+                    </IconTabFilter>
+
                     <IconTabFilter key="Ledgers" text="Ledgers" icon="sap-icon://ledger">
                         <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
                             <headerToolbar>
@@ -141,13 +201,11 @@
 
                                 <columns>
                                     <Column width="15%"><Text text="Ledger Name"/></Column>
-                                    <Column width="14%"><Text text="Parent Group"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Type"/></Column>
-                                    <Column width="10%" hAlign="End"><Text text="Opening"/></Column>
+                                    <Column width="12%"><Text text="Parent Group"/></Column>
+                                    <Column width="10%"><Text text="GSTIN"/></Column>
                                     <Column width="10%" hAlign="End"><Text text="Closing"/></Column>
-                                    <Column width="15%" hAlign="Center"><Text text="Sync ID"/></Column>
                                     <Column width="12%" hAlign="Center"><Text text="Sync Date"/></Column>
-                                    <Column width="6%" hAlign="Center"><Text text="Ctr"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
@@ -156,22 +214,17 @@
                                         highlight="{path: 'closingBalance', formatter: '.formatBalanceState'}">
                                         <ObjectIdentifier title="{name}" titleActive="false"/>
                                         <Text text="{parentGroup}" wrapping="false"/>
-                                        <Label text="{type}" design="Bold" wrapping="false"/>
-                                        <ObjectNumber number="{path: 'openingBalance', formatter: '.formatBalance'}" state="None"/>
+                                        <Text text="{gstin}" wrapping="false"/>
                                         <ObjectNumber number="{path: 'closingBalance', formatter: '.formatBalance'}" state="{path: 'closingBalance', formatter: '.formatBalanceState'}" emphasized="true"/>
-                                        <Text text="{syncId}" wrapping="false"/>
                                         <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
-                                        <HBox alignItems="Center" justifyContent="Center">
-                                            <core:Icon src="sap-icon://world" tooltip="{countryCode}" color="#0070F2" class="sapUiTinyMarginEnd"/>
-                                            <Text text="{countryCode}" wrapping="false"/>
-                                        </HBox>
+                                        <Button icon="sap-icon://hint" type="Transparent" press=".onViewDetails" tooltip="View all dynamic fields"/>
                                     </ColumnListItem>
                                 </items>
                             </Table>
 
                             <Toolbar height="2.5rem">
                                 <core:Icon src="sap-icon://connected" color="#107E3E" class="sapUiSmallMarginEnd"/>
-                                <Label text="Ledgers"/>
+                                <Label text="Total Unique Ledgers:"/>
                                 <ToolbarSpacer/>
                                 <Label text="{= ${/ledgers}.length + ' records'}" design="Bold"/>
                             </Toolbar>
@@ -206,35 +259,31 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="11%"><Text text="Date"/></Column>
+                                    <Column width="10%"><Text text="Date"/></Column>
                                     <Column width="11%"><Text text="Voucher Type"/></Column>
-                                    <Column width="8%"><Text text="Voucher No"/></Column>
+                                    <Column width="8%"><Text text="No."/></Column>
                                     <Column width="12%"><Text text="Party Name"/></Column>
-                                    <Column width="12%"><Text text="Reference No"/></Column>
                                     <Column width="13%"><Text text="Narration"/></Column>
-                                    <Column width="12%" hAlign="Center"><Text text="Sync ID"/></Column>
-                                    <Column width="10%" hAlign="Center"><Text text="Sync Date"/></Column>
-                                    <Column width="11%" hAlign="End"><Text text="Amount"/></Column>
+                                    <Column width="12%" hAlign="End"><Text text="Amount"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
                                     <ColumnListItem type="Active">
-                                        <Text text="{path: 'voucherDate', formatter: '.formatDate'}" wrapping="false"/>
-                                        <Text text="{voucherType}" wrapping="false"/>
+                                        <Text text="{voucherDate}" wrapping="false"/>
+                                        <Label text="{voucherType}" design="Bold"/>
                                         <Text text="{voucherNumber}" wrapping="false"/>
                                         <ObjectIdentifier title="{partyName}" titleActive="false"/>
-                                        <Text text="{referenceNo}" wrapping="false"/>
                                         <Text text="{narration}" wrapping="false" maxLines="1"/>
-                                        <Text text="{syncId}" wrapping="false"/>
-                                        <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
                                         <ObjectNumber number="{path: 'netAmount', formatter: '.formatBalance'}" state="{path: 'netAmount', formatter: '.formatBalanceState'}" emphasized="true"/>
+                                        <Button icon="sap-icon://hint" type="Transparent" press=".onViewDetails" tooltip="View all dynamic fields"/>
                                     </ColumnListItem>
                                 </items>
                             </Table>
 
                             <Toolbar height="2.5rem">
                                 <core:Icon src="sap-icon://connected" color="#107E3E" class="sapUiSmallMarginEnd"/>
-                                <Label text="Vouchers"/>
+                                <Label text="Total System Vouchers:"/>
                                 <ToolbarSpacer/>
                                 <Label text="{= ${/vouchers}.length + ' records'}" design="Bold"/>
                             </Toolbar>
@@ -275,22 +324,20 @@
                                     <Column width="8%" hAlign="End"><Text text="Qty"/></Column>
                                     <Column width="8%"><Text text="Unit"/></Column>
                                     <Column width="10%" hAlign="End"><Text text="Amount"/></Column>
-                                    <Column width="15%" hAlign="Center"><Text text="Sync ID"/></Column>
                                     <Column width="13%" hAlign="Center"><Text text="Sync Date"/></Column>
-                                    <Column width="8%" hAlign="End"><Text text="Closing"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
                                     <ColumnListItem type="Active">
                                         <ObjectIdentifier title="{stockName}" titleActive="false"/>
                                         <Text text="{category}" wrapping="false"/>
-                                        <ObjectNumber number="{path: 'rate', formatter: '.formatBalance'}" state="None"/>
+                                        <Text text="{rate}"/>
                                         <Text text="{quantity}"/>
                                         <Text text="{unit}" wrapping="false"/>
                                         <ObjectNumber number="{path: 'amount', formatter: '.formatBalance'}" state="None"/>
-                                        <Text text="{syncId}" wrapping="false"/>
                                         <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
-                                        <Text text="{closingStock}"/>
+                                        <Button icon="sap-icon://hint" type="Transparent" press=".onViewDetails" tooltip="View all dynamic fields"/>
                                     </ColumnListItem>
                                 </items>
                             </Table>

@@ -6,6 +6,7 @@ const path = require("path");
 const istTimestamp = require("../helpers/istTimestamp");
 
 const STORE_FILE = path.join(__dirname, "..", "..", "data", "store.json");
+const TOKEN_PROXY = "localhost:3002";
 
 let dataVersions = [];
 let versionCounter = 0;
@@ -38,36 +39,58 @@ function saveStore() {
 
 loadStore();
 
+function generateFingerprint(data) {
+    const content = JSON.stringify({
+        company: data.company,
+        type: data.dataType,
+        records: data.data ? data.data.length : 0,
+        firstRecord: data.data && data.data.length > 0 ? data.data[0] : null
+    });
+    return crypto.createHash("sha256").update(content).digest("hex").substring(0, 16);
+}
+
 function addVersion(data) {
     try {
-        versionCounter++;
-        
-        // --- UNIVERSAL DATA ADAPTER ---
-        // This ensures that regardless of the data shape, we extract something meaningful.
         let rawData = [];
-        let summary = { totalRecords: 0, totalLedgers: 0, totalAmount: 0 };
-        
         if (Array.isArray(data)) {
             rawData = data;
         } else if (data && typeof data === "object") {
-            // Try to find the data array in common fields
             rawData = data.data || data.value || data.entries || data.records || [];
-            // If data is just a single object and not an array, wrap it
             if (!Array.isArray(rawData) && typeof rawData === "object") rawData = [rawData];
         }
 
-        const company = data.company || (dataVersions.length > 0 ? dataVersions[dataVersions.length - 1].company : "Unknown");
-        const dataType = data.dataType || "Discovery";
+        let company = data.company || "";
+        if (!company && rawData.length > 0) {
+            for (let i = 0; i < Math.min(rawData.length, 5); i++) {
+                company = rawData[i].company || rawData[i].companyName || rawData[i].CompanyName || "";
+                if (company) break;
+            }
+        }
+        if (!company) company = dataVersions.length > 0 ? dataVersions[dataVersions.length - 1].company : "Unknown";
 
-        // Auto-calculate summary if missing
-        summary.totalRecords = data.totalRecords || rawData.length;
+        const dataType = data.dataType || "TallyData";
+        const syncId = data.syncId || data.cpiMessageId || ("hash-" + generateFingerprint({ company, dataType, data: rawData }));
+
+        const existing = dataVersions.find(v => v.syncId === syncId);
+        if (existing) {
+            console.log(`[backend] SKIP: Version with SyncID ${syncId} already exists.`);
+            return existing;
+        }
+
+        versionCounter++;
+        const summary = {
+            totalRecords: rawData.length,
+            totalLedgers: dataType.toLowerCase().includes("ledger") ? rawData.length : 0,
+            totalVouchers: dataType.toLowerCase().includes("voucher") ? rawData.length : 0,
+            totalStockItems: dataType.toLowerCase().includes("stock") ? rawData.length : 0,
+            totalAmount: 0
+        };
+        
         if (data.summary) {
             Object.assign(summary, data.summary);
         } else {
-            summary.totalLedgers = dataType === "Ledgers" ? rawData.length : 0;
-            // Attempt to sum up netAmount or closingBalance if available
             try {
-                summary.totalAmount = rawData.reduce((sum, item) => sum + (parseFloat(item.netAmount || item.closingBalance || 0)), 0);
+                summary.totalAmount = rawData.reduce((sum, item) => sum + (parseFloat(item.netAmount || item.closingBalance || item.amount || 0)), 0);
             } catch (e) {}
         }
 
@@ -75,8 +98,8 @@ function addVersion(data) {
             id: versionCounter,
             company: company,
             dataType: dataType,
-            syncId: data.syncId || data.cpiMessageId || "sid-" + Date.now(),
-            cpiMessageId: data.cpiMessageId || null,
+            syncId: syncId,
+            cpiMessageId: data.cpiMessageId || (syncId.startsWith("hash-") ? null : syncId),
             cpiDataStoreId: data.cpiDataStoreId || null,
             cpiPushDate: data.cpiPushDate || new Date().toISOString(),
             totalRecords: summary.totalRecords,
@@ -87,267 +110,125 @@ function addVersion(data) {
 
         dataVersions.push(version);
         saveStore();
-        console.log(`[backend] SUCCESS: Version ${version.id} added (${version.totalRecords} records for ${version.company})`);
+        console.log(`[backend] COMMITTED: Version ${version.id} [${company}] - ${version.totalRecords} records.`);
         return version;
     } catch (err) {
-        console.error("[backend] CRITICAL: Data normalization failed:", err.message);
-        // Fallback to a safe empty version instead of throwing
-        return { id: 0, company: "Error", data: [], summary: {} };
+        console.error("[backend] INGESTION ERROR:", err.message);
+        return null;
     }
 }
 
 function fetchFromCpi(dataStoreId) {
     return new Promise(function (resolve) {
         const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
-        
         http.get(url, function (res) {
             let data = "";
             res.on("data", (chunk) => data += chunk);
             res.on("end", function () {
-                if (res.statusCode !== 200) {
-                    console.error(`[backend] BTP Fetch Error: HTTP ${res.statusCode}`);
-                    return resolve({ data: [], error: "BTP_UNAVAILABLE" });
-                }
-                try {
-                    resolve(JSON.parse(data || "{}"));
-                } catch (e) {
-                    console.error("[backend] BTP returned invalid JSON");
-                    resolve({ data: [], error: "INVALID_JSON" });
-                }
+                if (res.statusCode !== 200) return resolve({ data: [], error: "HTTP_" + res.statusCode });
+                try { resolve(JSON.parse(data || "{}")); } catch (e) { resolve({ data: [], error: "INVALID_JSON" }); }
             });
-        }).on("error", (err) => {
-            console.error("[backend] Connection to Proxy failed:", err.message);
-            resolve({ data: [], error: "PROXY_OFFLINE" });
-        });
+        }).on("error", (err) => resolve({ data: [], error: "PROXY_OFFLINE" }));
     });
 }
 
 function fetchFreshFromCpi(dataStoreId) {
     return new Promise(function (resolve) {
         const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
-        
         http.get(url, function (res) {
             let raw = "";
             res.on("data", (chunk) => raw += chunk);
             res.on("end", function () {
-                const meta = {
-                    cpiMessageId: res.headers["sap_messageprocessinglogid"] || res.headers["sap-message-id"] || null,
-                    status: res.statusCode
-                };
-
-                if (res.statusCode !== 200) {
-                    return resolve({ meta, body: [], error: "HTTP_" + res.statusCode });
-                }
-                try {
-                    resolve({ meta, body: JSON.parse(raw || "[]") });
-                } catch (e) {
-                    resolve({ meta, body: [], error: "JSON_PARSE_ERROR" });
-                }
+                const meta = { cpiMessageId: res.headers["sap_messageprocessinglogid"] || res.headers["sap-message-id"] || null, status: res.statusCode };
+                if (res.statusCode !== 200) return resolve({ meta, body: [], error: "HTTP_" + res.statusCode });
+                try { resolve({ meta, body: JSON.parse(raw || "[]") }); } catch (e) { resolve({ meta, body: [], error: "JSON_PARSE_ERROR" }); }
             });
-        }).on("error", (err) => {
-            resolve({ meta: {}, body: [], error: "PROXY_OFFLINE" });
-        });
+        }).on("error", (err) => resolve({ meta: {}, body: [], error: "PROXY_OFFLINE" }));
     });
 }
 
 const router = Router();
 
-// ... (GET /versions and GET /versions/:id remain largely the same)
+router.get("/versions", (req, res) => res.json(dataVersions.map(v => ({ id: v.id, timestamp: v.timestamp, syncId: v.syncId, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords }))));
+router.get("/versions/:id", (req, res) => { const v = dataVersions.find(v => v.id === parseInt(req.params.id)); v ? res.json(v) : res.status(404).json({ error: "Not found" }); });
 
 router.get("/http/read-tally", function (req, res) {
-    // Self-healing: Always return SOMETHING valid
     fetchFromCpi(null).then(data => {
-        if (data.error) {
-            console.log("[backend] Fetch failed, serving last known good data");
-            return res.json(dataVersions[dataVersions.length - 1] || { data: [] });
-        }
+        if (data.error) return res.json(dataVersions[dataVersions.length - 1] || { data: [] });
         const v = addVersion(data);
-        res.json(v);
+        res.json(v || dataVersions[dataVersions.length - 1] || { data: [] });
     });
 });
 
 router.post("/sync/btp-fetch", function (req, res) {
-    console.log("[manual-sync] Discovery mode triggered...");
-
-    fetchFreshFromCpi(null)
-        .then(function (result) {
-            if (result.error) {
-                return res.status(200).json({
-                    success: false,
-                    error: "BTP Sync Exception",
-                    details: result.error,
-                    tip: "Check your BTP Credentials in token-proxy.js. Ensure the Proxy is running."
-                });
-            }
-
-            const body = result.body;
-            const meta = result.meta;
-            const items = Array.isArray(body) ? body : [body];
-            
-            let count = 0;
-            items.forEach(item => {
-                const syncId = item.syncId || item.cpiMessageId || meta.cpiMessageId;
-                const isDup = dataVersions.some(v => v.syncId === syncId);
-                if (!isDup && (Array.isArray(item) || item.data || item.company)) {
-                    addVersion(item);
-                    count++;
-                }
-            });
-
-            res.json({
-                success: true,
-                totalFound: items.length,
-                newVersions: count,
-                message: `Discovery complete. ${count} versions added.`
-            });
-        })
-        .catch(err => {
-            res.json({ success: false, error: "Global Sync Exception", details: err.message });
+    fetchFreshFromCpi(null).then(function (result) {
+        if (result.error) return res.status(200).json({ success: false, error: "BTP Sync Exception", details: result.error });
+        const body = result.body;
+        const meta = result.meta;
+        const items = Array.isArray(body) ? body : [body];
+        let addedCount = 0;
+        let skippedCount = 0;
+        items.forEach(item => {
+            const syncId = item.syncId || item.cpiMessageId || meta.cpiMessageId;
+            console.log("[debug-sync] Received ID from BTP:", syncId, "Company:", item.company);
+            const isDup = dataVersions.some(v => v.syncId === syncId);
+            if (!isDup && (Array.isArray(item) || (item && (item.data || item.company)))) {
+                if (addVersion(item)) addedCount++; else skippedCount++;
+            } else { skippedCount++; }
         });
+        res.json({ success: true, status: "Verification Complete", totalAnalyzed: items.length, newVersions: addedCount, duplicatesSkipped: skippedCount, message: addedCount > 0 ? `Success: ${addedCount} documents verified and synced.` : "Verification complete: No new data found." });
+    }).catch(err => res.json({ success: false, error: "Global Sync Exception", details: err.message }));
 });
 
-router.post("/refresh", function (req, res) {
-    var latest = dataVersions[dataVersions.length - 1] || {};
-    console.log("[backend] Refresh triggered — " + dataVersions.length + " versions available");
-    res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords });
-});
+router.post("/refresh", (req, res) => { const latest = dataVersions[dataVersions.length - 1] || {}; res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords }); });
 
-router.get("/health", function (_req, res) {
-    var latest = dataVersions[dataVersions.length - 1] || {};
-    res.json({
-        status: "ok",
-        versions: dataVersions.length,
-        lastSync: latest.timestamp,
-        syncId: latest.syncId,
-        records: latest.totalRecords,
-        dataType: latest.dataType,
-        company: latest.company
-    });
-});
-
-// ── OData v4 endpoints (for Fiori frontend) ─────────────────────────────────
+router.get("/health", (_req, res) => { const latest = dataVersions[dataVersions.length - 1] || {}; res.json({ status: "ok", versions: dataVersions.length, lastSync: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords, company: latest.company }); });
 
 const odataRouter = Router();
 
-odataRouter.get("/v4/tally/Syncs", function (req, res) {
-    var sorted = dataVersions.slice().sort(function (a, b) {
-        return b.timestamp.localeCompare(a.timestamp);
-    });
-    var top = parseInt(req.query.$top, 10) || sorted.length;
-    var result = sorted.slice(0, top).map(function (v) {
-        return {
-            syncId: v.cpiMessageId || v.syncId || "—",
-            versionId: v.id,
-            company: v.company,
-            dataType: v.dataType,
-            totalRecords: v.totalRecords,
-            cpiMessageId: v.cpiMessageId,
-            cpiDataStoreId: v.cpiDataStoreId,
-            pushedAt: v.timestamp,
-            date: v.timestamp ? v.timestamp.split("T")[0] : null,
-            totalLedgers: v.summary.totalLedgers || 0,
-            partyLedgers: v.summary.partyLedgers || 0,
-            withGstin: v.summary.withGstin || 0,
-            withEmail: v.summary.withEmail || 0,
-            totalBalance: v.summary.totalBalance || 0,
-            totalVouchers: v.summary.totalVouchers || 0,
-            totalAmount: v.summary.totalAmount || 0,
-            totalItems: v.summary.totalItems || 0,
-            totalQuantity: v.summary.totalQuantity || 0
-        };
-    });
-    res.json({ value: result });
+odataRouter.get("/v4/tally/Syncs", (req, res) => {
+    const sorted = dataVersions.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    const top = parseInt(req.query.$top, 10) || sorted.length;
+    res.json({ value: sorted.slice(0, top).map(v => ({ syncId: v.cpiMessageId || v.syncId || "—", versionId: v.id, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords, cpiMessageId: v.cpiMessageId, pushedAt: v.timestamp, date: v.timestamp ? v.timestamp.split("T")[0] : null, totalLedgers: v.summary.totalLedgers || 0, totalVouchers: v.summary.totalVouchers || 0, totalAmount: v.summary.totalAmount || 0 })) });
 });
 
-odataRouter.get("/v4/tally/Ledgers", function (req, res) {
-    var seen = {};
-    var ledgers = [];
-    for (var i = dataVersions.length - 1; i >= 0; i--) {
-        var v = dataVersions[i];
-        (v.data || []).forEach(function (d) {
-            if (!d.name || d.voucherDate || d.voucherNumber) return;
-            var key = d.name + "|" + (d.parentGroup || "");
-            if (!seen[key]) {
-                seen[key] = true;
-                ledgers.push({
-                    syncId: v.cpiMessageId || v.syncId || "—",
-                    syncDate: v.timestamp,
-                    name: d.name,
-                    parentGroup: d.parentGroup,
-                    type: d.type,
-                    openingBalance: d.openingBalance,
-                    closingBalance: d.closingBalance,
-                    currency: d.currency || "INR",
-                    countryCode: d.countryCode || "IN"
-                });
-            }
+odataRouter.get("/v4/tally/Ledgers", (req, res) => {
+    let seen = {}; let ledgers = [];
+    for (let i = dataVersions.length - 1; i >= 0; i--) {
+        const v = dataVersions[i];
+        (v.data || []).forEach(d => {
+            if (!d.name || d.voucherDate) return;
+            const key = d.name + "|" + (d.parentGroup || "");
+            if (!seen[key]) { seen[key] = true; ledgers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
         });
     }
-    ledgers.sort(function(a, b) { return a.name.localeCompare(b.name); });
-    res.json({ value: ledgers });
+    res.json({ value: ledgers.sort((a, b) => a.name.localeCompare(b.name)) });
 });
 
-odataRouter.get("/v4/tally/Vouchers", function (req, res) {
-    var seen = {};
-    var vouchers = [];
-    for (var i = dataVersions.length - 1; i >= 0; i--) {
-        var v = dataVersions[i];
-        (v.data || []).forEach(function (d) {
+odataRouter.get("/v4/tally/Vouchers", (req, res) => {
+    let seen = {}; let vouchers = [];
+    for (let i = dataVersions.length - 1; i >= 0; i--) {
+        const v = dataVersions[i];
+        (v.data || []).forEach(d => {
             if (!d.voucherDate && !d.partyName) return;
-            var key = d.guid || (d.voucherNumber + "|" + d.partyName);
-            if (!seen[key]) {
-                seen[key] = true;
-                vouchers.push({
-                    syncId: v.cpiMessageId || v.syncId || "—",
-                    syncDate: v.timestamp,
-                    guid: d.guid,
-                    voucherDate: d.voucherDate,
-                    voucherType: d.voucherType,
-                    voucherNumber: d.voucherNumber,
-                    referenceNo: d.referenceNo,
-                    partyName: d.partyName,
-                    narration: d.narration,
-                    netAmount: d.netAmount,
-                    lineItemCount: d.lineItemCount,
-                    isInvoice: d.isInvoice,
-                    isOptional: d.isOptional,
-                    isPostDated: d.isPostDated
-                });
-            }
+            const key = d.guid || (d.voucherNumber + "|" + d.partyName);
+            if (!seen[key]) { seen[key] = true; vouchers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
         });
     }
-    vouchers.sort(function(a, b) { return (b.voucherDate || "").localeCompare(a.voucherDate || ""); });
-    res.json({ value: vouchers });
+    res.json({ value: vouchers.sort((a, b) => (b.voucherDate || "").localeCompare(a.voucherDate || "")) });
 });
 
-odataRouter.get("/v4/tally/StockItems", function (req, res) {
-    var seen = {};
-    var items = [];
-    for (var i = dataVersions.length - 1; i >= 0; i--) {
-        var v = dataVersions[i];
-        (v.data || []).forEach(function (d) {
-            if (!d.stockName && !d.rate && !d.quantity) return;
-            var key = d.guid || d.stockName || JSON.stringify(d);
-            if (!seen[key]) {
-                seen[key] = true;
-                items.push({
-                    syncId: v.cpiMessageId || v.syncId || "—",
-                    syncDate: v.timestamp,
-                    guid: d.guid,
-                    stockName: d.stockName,
-                    category: d.category,
-                    rate: d.rate,
-                    quantity: d.quantity,
-                    unit: d.unit,
-                    amount: d.amount,
-                    openingStock: d.openingStock,
-                    closingStock: d.closingStock
-                });
-            }
+odataRouter.get("/v4/tally/StockItems", (req, res) => {
+    let seen = {}; let items = [];
+    for (let i = dataVersions.length - 1; i >= 0; i--) {
+        const v = dataVersions[i];
+        (v.data || []).forEach(d => {
+            if (!d.stockName && !d.rate) return;
+            const key = d.guid || d.stockName || JSON.stringify(d);
+            if (!seen[key]) { seen[key] = true; items.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
         });
     }
-    items.sort(function(a, b) { return (a.stockName || "").localeCompare(b.stockName || ""); });
-    res.json({ value: items });
+    res.json({ value: items.sort((a, b) => (a.stockName || "").localeCompare(b.stockName || "")) });
 });
 
 module.exports = { router, odataRouter, addVersion, fetchFromCpi, dataVersions };

@@ -2,405 +2,2039 @@
   "dataVersions": [
     {
       "id": 1,
-      "company": "Aa",
+      "company": "My Company",
       "dataType": "Ledgers",
-      "syncId": "AGohQVYeJJ_J-IoKRPxdzgbTCvN-",
-      "cpiMessageId": "AGohQVYeJJ_J-IoKRPxdzgbTCvN-",
-      "cpiDataStoreId": "3c62c0b7-c507-4ceb-8a1b-37d561bbf37d",
-      "cpiPushDate": "Thu, 04 Jun 2026 09:11:50 GMT",
-      "totalRecords": 6,
-      "timestamp": "2026-06-04T09:11:50.363Z",
+      "syncId": "a072f6cb-161c-4b1a-8d04-0d32b49fcf4e",
+      "cpiMessageId": "a072f6cb-161c-4b1a-8d04-0d32b49fcf4e",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.527Z",
+      "totalRecords": 3,
+      "timestamp": "2026-06-05T08:54:31.527Z",
       "summary": {
-        "totalLedgers": 6,
-        "partyLedgers": 0,
-        "withGstin": 0,
-        "withEmail": 0,
-        "totalBalance": 0
+        "totalRecords": 3,
+        "totalLedgers": 5,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "partyLedgers": 3,
+        "withGstin": 2,
+        "withEmail": 1,
+        "totalBalance": 150000
       },
       "data": [
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001f",
           "name": "Cash",
           "parentGroup": "Cash-in-Hand",
+          "type": "General",
           "openingBalance": 0,
           "closingBalance": 777,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d4",
-          "name": "Gsshf0hg",
-          "parentGroup": "Cash-in-Hand",
-          "openingBalance": 65422,
-          "closingBalance": 65422,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001e",
           "name": "Profit & Loss A/c",
-          "parentGroup": "\u0004 Primary",
+          "parentGroup": "Primary",
+          "type": "General",
           "openingBalance": 0,
           "closingBalance": 0,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d2",
           "name": "Shivam",
           "parentGroup": "Capital Account",
+          "type": "General",
           "openingBalance": 563,
           "closingBalance": 563,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d3",
-          "name": "Sudhir",
-          "parentGroup": "Capital Account",
-          "openingBalance": 999999,
-          "closingBalance": 999999,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000cc",
-          "name": "Vaibhav",
-          "parentGroup": "Capital Account",
-          "openingBalance": 0,
-          "closingBalance": 777,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         }
       ]
     },
     {
       "id": 2,
-      "company": "Aa",
-      "dataType": "Ledgers",
-      "syncId": "AGohQVY8jSU4XcaCL1OU-n4anhuX",
-      "cpiMessageId": "AGohQVY8jSU4XcaCL1OU-n4anhuX",
-      "cpiDataStoreId": "8ee0fc34-5539-4804-a637-9215233c22ec",
-      "cpiPushDate": "Thu, 04 Jun 2026 09:11:50 GMT",
-      "totalRecords": 1,
-      "timestamp": "2026-06-04T09:11:50.766Z",
+      "company": "Tally",
+      "dataType": "ledgers",
+      "syncId": "9b516db4-d282-428c-88d5-6482a94a895d",
+      "cpiMessageId": "9b516db4-d282-428c-88d5-6482a94a895d",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.527Z",
+      "totalRecords": 67,
+      "timestamp": "2026-06-05T08:54:31.527Z",
       "summary": {
-        "totalLedgers": 0,
+        "totalRecords": 67,
+        "totalLedgers": 67,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
         "partyLedgers": 0,
         "withGstin": 0,
-        "withEmail": 0,
-        "totalBalance": 0
+        "withEmail": 5,
+        "totalBalance": 2393100439024,
+        "topGroups": [
+          {
+            "group": "Capital Account",
+            "count": 19
+          },
+          {
+            "group": "Sundry Debtors",
+            "count": 18
+          },
+          {
+            "group": "Sundry Creditors",
+            "count": 10
+          },
+          {
+            "group": "Indirect Expenses",
+            "count": 7
+          },
+          {
+            "group": "Cash-in-Hand",
+            "count": 2
+          },
+          {
+            "group": "Indirect Incomes",
+            "count": 2
+          },
+          {
+            "group": "Bank Accounts",
+            "count": 2
+          },
+          {
+            "group": "Purchase Accounts",
+            "count": 2
+          },
+          {
+            "group": "Sales Accounts",
+            "count": 2
+          },
+          {
+            "group": "\u0004 Primary",
+            "count": 1
+          },
+          {
+            "group": "Current Assets",
+            "count": 1
+          },
+          {
+            "group": "Loans & Advances (Asset)",
+            "count": 1
+          }
+        ]
       },
       "data": [
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-00000001",
-          "voucherDate": "2025-03-31",
-          "voucherType": "Payment",
-          "voucherNumber": "1",
-          "referenceNo": null,
-          "partyName": "Cash",
-          "narration": null,
-          "netAmount": 777,
-          "lineItemCount": 2,
-          "isInvoice": false,
-          "isOptional": false,
-          "isPostDated": false
+          "name": "ABCDTraders",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 60356090,
+          "closingBalance": 60356090,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "ABC Traders",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 24222285,
+          "closingBalance": 24236295,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Amay",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 23489726,
+          "closingBalance": 23503736,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Amey",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 160226,
+          "closingBalance": 160226,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Aniket",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 555,
+          "closingBalance": 14145,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Banana",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 5527562041,
+          "closingBalance": 5527562041,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Burger",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 159782,
+          "closingBalance": 159782,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 8842180,
+          "closingBalance": 8842180,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Cash322",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 1369,
+          "closingBalance": 1369,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customer1",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 671,
+          "closingBalance": 671,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customer2",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 4995200,
+          "closingBalance": 4995200,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customers5",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 6222223,
+          "closingBalance": 6222223,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Godsman",
+          "parentGroup": "Indirect Incomes",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "JOJO",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 24022026,
+          "closingBalance": 24022026,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Kenstar Enterprises",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Manish",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 1000,
+          "closingBalance": 1000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense2",
+          "parentGroup": "Indirect Incomes",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense3",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Omkar Dahifale",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 202594,
+          "closingBalance": 202594,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Please",
+          "parentGroup": "Bank Accounts",
+          "type": "General",
+          "openingBalance": 6000,
+          "closingBalance": 7590,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 29462391.01,
+          "closingBalance": 29462381.01,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Purchase",
+          "parentGroup": "Purchase Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "RAJLAXMI",
+          "parentGroup": "Bank Accounts",
+          "type": "General",
+          "openingBalance": 4274515,
+          "closingBalance": 4274515,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Rajnivas Enterprises",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 10,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 10000,
+          "closingBalance": 10000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 1061252799182,
+          "closingBalance": 1061252799182,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram600",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram700",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram800",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Rammmm500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ramnarayan",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales",
+          "parentGroup": "Sales Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales2",
+          "parentGroup": "Sales Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales 24",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 55,
+          "closingBalance": 55,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Scam",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sgegse",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shaaaam",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shivam Khaw",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 6530,
+          "closingBalance": 6530,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "ShivamRamKhaw",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 93712534040,
+          "closingBalance": 93712534040,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shyam",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "SPYDER",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Spyderman",
+          "parentGroup": "Current Assets",
+          "type": "General",
+          "openingBalance": 5000,
+          "closingBalance": 5000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sudhir",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 249524332,
+          "closingBalance": 249524332,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sudhir26022026",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 26021976,
+          "closingBalance": 26021976,
+          "email": "sudhirjob@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "SudhirMorchale",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 256868636,
+          "closingBalance": 256868636,
+          "email": "sudhir@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Superman",
+          "parentGroup": "Purchase Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Supplier1",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 1000,
+          "closingBalance": 1010,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Supplier2",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Suppliers5",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 7575,
+          "closingBalance": 7575,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Suryavanshi",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 215594,
+          "closingBalance": 215594,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test18022026",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 18022026,
+          "closingBalance": 18022026,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 1155034148813,
+          "closingBalance": 1155034148813,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test600",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 998982,
+          "closingBalance": 998982,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Customer",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 5700,
+          "closingBalance": 5700,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestCustomer3",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "email": "sudhirmorchale@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestCustomer4",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 67567575,
+          "closingBalance": 67567575,
+          "email": "Raju@gmail.Com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testeerjojojo",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test GST Customer",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 76767676767,
+          "closingBalance": 76767676767,
+          "pan": "4654563565",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestGstCustomer2",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "pan": "4444444444",
+          "email": "amay@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Ledger 999",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Ledger Sync",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Supplier",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TEST-SUPPLIER2",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 279.5,
+          "closingBalance": 279.5,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "UpdateLedgerTest",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 100,
+          "closingBalance": 100,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "upplier1",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Vbjk",
+          "parentGroup": "Loans & Advances (Asset)",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
         }
       ]
     },
     {
       "id": 3,
-      "company": "Aa",
-      "dataType": "Ledgers",
-      "syncId": "AGohRjIWvoBiN-tXTeMSocXnZMln",
-      "cpiMessageId": "AGohRjIWvoBiN-tXTeMSocXnZMln",
-      "cpiDataStoreId": "fdfc4049-ce19-4705-a9c6-4c8970470c8d",
-      "cpiPushDate": "Thu, 04 Jun 2026 09:32:35 GMT",
-      "totalRecords": 6,
-      "timestamp": "2026-06-04T09:32:35.186Z",
+      "company": "Tally",
+      "dataType": "vouchers",
+      "syncId": "cb688c48-8e93-453e-8d0d-9bab94f8f156",
+      "cpiMessageId": "cb688c48-8e93-453e-8d0d-9bab94f8f156",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.544Z",
+      "totalRecords": 3,
+      "timestamp": "2026-06-05T08:54:31.544Z",
       "summary": {
-        "totalLedgers": 6,
-        "partyLedgers": 0,
-        "withGstin": 0,
-        "withEmail": 0,
-        "totalBalance": 0
+        "totalRecords": 3,
+        "totalLedgers": 0,
+        "totalVouchers": 3,
+        "totalStockItems": 0,
+        "totalAmount": 27610,
+        "byType": {
+          "Journal": 2,
+          "Receipt": 1
+        }
       },
       "data": [
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001f",
-          "name": "Cash",
-          "parentGroup": "Cash-in-Hand",
-          "openingBalance": 0,
-          "closingBalance": 777,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Journal",
+          "partyName": "Please",
+          "netAmount": 13590,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d4",
-          "name": "Gsshf0hg",
-          "parentGroup": "Cash-in-Hand",
-          "openingBalance": 65422,
-          "closingBalance": 65422,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "voucherNumber": "2",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Journal",
+          "partyName": "ABC Traders",
+          "netAmount": 14010,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001e",
-          "name": "Profit & Loss A/c",
-          "parentGroup": "\u0004 Primary",
-          "openingBalance": 0,
-          "closingBalance": 0,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d2",
-          "name": "Shivam",
-          "parentGroup": "Capital Account",
-          "openingBalance": 563,
-          "closingBalance": 563,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d3",
-          "name": "Sudhir",
-          "parentGroup": "Capital Account",
-          "openingBalance": 999999,
-          "closingBalance": 999999,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
-        },
-        {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000cc",
-          "name": "Vaibhav",
-          "parentGroup": "Capital Account",
-          "openingBalance": 0,
-          "closingBalance": 777,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Receipt",
+          "partyName": "Supplier1",
+          "netAmount": 10,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
         }
       ]
     },
     {
       "id": 4,
-      "company": "—",
-      "dataType": "Ledgers",
-      "syncId": "AGoiTRrE3-QNOMzs5bAH1WW1_qbs",
-      "cpiMessageId": "AGoiTRrE3-QNOMzs5bAH1WW1_qbs",
-      "cpiDataStoreId": "a9d52f68-c3ec-4dc2-8056-9c35d928a118",
-      "cpiPushDate": "Fri, 05 Jun 2026 04:14:18 GMT",
+      "company": "Tally",
+      "dataType": "stockItems",
+      "syncId": "5ce64b87-f393-4589-8cb8-66cc03e5086e",
+      "cpiMessageId": "5ce64b87-f393-4589-8cb8-66cc03e5086e",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.550Z",
       "totalRecords": 0,
-      "timestamp": "2026-06-05T04:14:18.773Z",
+      "timestamp": "2026-06-05T08:54:31.550Z",
       "summary": {
+        "totalRecords": 0,
         "totalLedgers": 0,
-        "partyLedgers": 0,
-        "withGstin": 0,
-        "withEmail": 0,
-        "totalBalance": 0
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0
       },
       "data": []
     },
     {
       "id": 5,
-      "company": "Aa",
-      "dataType": "Ledgers",
-      "syncId": "AGoiTR_7ocq6-okfV0lILiecyi6C",
-      "cpiMessageId": "AGoiTR_7ocq6-okfV0lILiecyi6C",
-      "cpiDataStoreId": "e8af9c1d-ea28-4abe-889d-9a48c79c3fbb",
-      "cpiPushDate": "Fri, 05 Jun 2026 04:14:23 GMT",
-      "totalRecords": 6,
-      "timestamp": "2026-06-05T04:14:23.197Z",
+      "company": "SAURAbh",
+      "dataType": "all",
+      "syncId": "462d5f4e-8c4b-4151-9e95-3fcb4a4736c8",
+      "cpiMessageId": "462d5f4e-8c4b-4151-9e95-3fcb4a4736c8",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.558Z",
+      "totalRecords": 1,
+      "timestamp": "2026-06-05T08:54:31.558Z",
       "summary": {
-        "totalLedgers": 6,
-        "partyLedgers": 0,
-        "withGstin": 0,
-        "withEmail": 0,
-        "totalBalance": 0
+        "totalRecords": 1,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 4,
+        "vouchers": 0,
+        "stockItems": 0
       },
       "data": [
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001f",
+          "ledgers": [
+            {
+              "name": "Cash",
+              "parentGroup": "Cash-in-Hand",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger1",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger2",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Profit & Loss A/c",
+              "parentGroup": "\u0004 Primary",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            }
+          ],
+          "vouchers": [],
+          "stockItems": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "company": "Aa",
+      "dataType": "ledgers",
+      "syncId": "04d44c8a-2bdb-4d16-ab94-2d5b2426a205",
+      "cpiMessageId": "04d44c8a-2bdb-4d16-ab94-2d5b2426a205",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.563Z",
+      "totalRecords": 6,
+      "timestamp": "2026-06-05T08:54:31.563Z",
+      "summary": {
+        "totalRecords": 6,
+        "totalLedgers": 6,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "partyLedgers": 0,
+        "withGstin": 0,
+        "withEmail": 0,
+        "totalBalance": 1067538,
+        "topGroups": [
+          {
+            "group": "Capital Account",
+            "count": 3
+          },
+          {
+            "group": "Cash-in-Hand",
+            "count": 2
+          },
+          {
+            "group": "\u0004 Primary",
+            "count": 1
+          }
+        ]
+      },
+      "data": [
+        {
           "name": "Cash",
           "parentGroup": "Cash-in-Hand",
-          "openingBalance": 0,
-          "closingBalance": 777,
           "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d4",
           "name": "Gsshf0hg",
           "parentGroup": "Cash-in-Hand",
+          "type": "General",
           "openingBalance": 65422,
           "closingBalance": 65422,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001e",
           "name": "Profit & Loss A/c",
           "parentGroup": "\u0004 Primary",
+          "type": "General",
           "openingBalance": 0,
           "closingBalance": 0,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d2",
           "name": "Shivam",
           "parentGroup": "Capital Account",
+          "type": "General",
           "openingBalance": 563,
           "closingBalance": 563,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d3",
           "name": "Sudhir",
           "parentGroup": "Capital Account",
+          "type": "General",
           "openingBalance": 999999,
           "closingBalance": 999999,
-          "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "currency": "INR",
+          "countryCode": "IN"
         },
         {
-          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000cc",
           "name": "Vaibhav",
           "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "company": "Aa",
+      "dataType": "vouchers",
+      "syncId": "1572f52a-5f1f-454a-80a5-a8142f15a0e4",
+      "cpiMessageId": "1572f52a-5f1f-454a-80a5-a8142f15a0e4",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T08:54:31.569Z",
+      "totalRecords": 0,
+      "timestamp": "2026-06-05T08:54:31.569Z",
+      "summary": {
+        "totalRecords": 0,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "byType": {}
+      },
+      "data": []
+    },
+    {
+      "id": 8,
+      "company": "My Company",
+      "dataType": "Ledgers",
+      "syncId": "AGoiYJAAq6Abx5XmFAyRVSr05Q1k",
+      "cpiMessageId": "AGoiYJAAq6Abx5XmFAyRVSr05Q1k",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.118Z",
+      "totalRecords": 3,
+      "timestamp": "2026-06-05T09:44:14.118Z",
+      "summary": {
+        "totalRecords": 3,
+        "totalLedgers": 5,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "partyLedgers": 3,
+        "withGstin": 2,
+        "withEmail": 1,
+        "totalBalance": 150000
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
           "openingBalance": 0,
           "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "Primary",
           "type": "General",
-          "phone": null,
-          "email": null,
-          "pan": null,
-          "gstin": null,
-          "state": null,
-          "pincode": null,
-          "bankAccount": null,
-          "ifsc": null
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shivam",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 563,
+          "closingBalance": 563,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "company": "Tally",
+      "dataType": "ledgers",
+      "syncId": "AGoiZRz_6iKIFPakUqkokQdBG5sY",
+      "cpiMessageId": "AGoiZRz_6iKIFPakUqkokQdBG5sY",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.119Z",
+      "totalRecords": 67,
+      "timestamp": "2026-06-05T09:44:14.119Z",
+      "summary": {
+        "totalRecords": 67,
+        "totalLedgers": 67,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "partyLedgers": 0,
+        "withGstin": 0,
+        "withEmail": 5,
+        "totalBalance": 2393100439024,
+        "topGroups": [
+          {
+            "group": "Capital Account",
+            "count": 19
+          },
+          {
+            "group": "Sundry Debtors",
+            "count": 18
+          },
+          {
+            "group": "Sundry Creditors",
+            "count": 10
+          },
+          {
+            "group": "Indirect Expenses",
+            "count": 7
+          },
+          {
+            "group": "Cash-in-Hand",
+            "count": 2
+          },
+          {
+            "group": "Indirect Incomes",
+            "count": 2
+          },
+          {
+            "group": "Bank Accounts",
+            "count": 2
+          },
+          {
+            "group": "Purchase Accounts",
+            "count": 2
+          },
+          {
+            "group": "Sales Accounts",
+            "count": 2
+          },
+          {
+            "group": "\u0004 Primary",
+            "count": 1
+          },
+          {
+            "group": "Current Assets",
+            "count": 1
+          },
+          {
+            "group": "Loans & Advances (Asset)",
+            "count": 1
+          }
+        ]
+      },
+      "data": [
+        {
+          "name": "ABCDTraders",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 60356090,
+          "closingBalance": 60356090,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "ABC Traders",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 24222285,
+          "closingBalance": 24236295,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Amay",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 23489726,
+          "closingBalance": 23503736,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Amey",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 160226,
+          "closingBalance": 160226,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Aniket",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 555,
+          "closingBalance": 14145,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Banana",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 5527562041,
+          "closingBalance": 5527562041,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Burger",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 159782,
+          "closingBalance": 159782,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 8842180,
+          "closingBalance": 8842180,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Cash322",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 1369,
+          "closingBalance": 1369,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customer1",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 671,
+          "closingBalance": 671,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customer2",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 4995200,
+          "closingBalance": 4995200,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Customers5",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 6222223,
+          "closingBalance": 6222223,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Godsman",
+          "parentGroup": "Indirect Incomes",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "JOJO",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 24022026,
+          "closingBalance": 24022026,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Kenstar Enterprises",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Manish",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 1000,
+          "closingBalance": 1000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense2",
+          "parentGroup": "Indirect Incomes",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Office Expense3",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Omkar Dahifale",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 202594,
+          "closingBalance": 202594,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Please",
+          "parentGroup": "Bank Accounts",
+          "type": "General",
+          "openingBalance": 6000,
+          "closingBalance": 7590,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 29462391.01,
+          "closingBalance": 29462381.01,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Purchase",
+          "parentGroup": "Purchase Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "RAJLAXMI",
+          "parentGroup": "Bank Accounts",
+          "type": "General",
+          "openingBalance": 4274515,
+          "closingBalance": 4274515,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Rajnivas Enterprises",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 10,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 10000,
+          "closingBalance": 10000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 1061252799182,
+          "closingBalance": 1061252799182,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram600",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram700",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ram800",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Rammmm500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Ramnarayan",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales",
+          "parentGroup": "Sales Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales2",
+          "parentGroup": "Sales Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sales 24",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 55,
+          "closingBalance": 55,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Scam",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sgegse",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shaaaam",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shivam Khaw",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 6530,
+          "closingBalance": 6530,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "ShivamRamKhaw",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 93712534040,
+          "closingBalance": 93712534040,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shyam",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "SPYDER",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Spyderman",
+          "parentGroup": "Current Assets",
+          "type": "General",
+          "openingBalance": 5000,
+          "closingBalance": 5000,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sudhir",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 249524332,
+          "closingBalance": 249524332,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sudhir26022026",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 26021976,
+          "closingBalance": 26021976,
+          "email": "sudhirjob@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "SudhirMorchale",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 256868636,
+          "closingBalance": 256868636,
+          "email": "sudhir@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Superman",
+          "parentGroup": "Purchase Accounts",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Supplier1",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 1000,
+          "closingBalance": 1010,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Supplier2",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Suppliers5",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 7575,
+          "closingBalance": 7575,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Suryavanshi",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 215594,
+          "closingBalance": 215594,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test18022026",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 18022026,
+          "closingBalance": 18022026,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test500",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 1155034148813,
+          "closingBalance": 1155034148813,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test600",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 998982,
+          "closingBalance": 998982,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Customer",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 5700,
+          "closingBalance": 5700,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestCustomer3",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "email": "sudhirmorchale@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestCustomer4",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 67567575,
+          "closingBalance": 67567575,
+          "email": "Raju@gmail.Com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testeerjojojo",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test GST Customer",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 76767676767,
+          "closingBalance": 76767676767,
+          "pan": "4654563565",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TestGstCustomer2",
+          "parentGroup": "Sundry Debtors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "pan": "4444444444",
+          "email": "amay@gmail.com",
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Ledger 999",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Ledger Sync",
+          "parentGroup": "Indirect Expenses",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Test Supplier",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "TEST-SUPPLIER2",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 279.5,
+          "closingBalance": 279.5,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "UpdateLedgerTest",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 100,
+          "closingBalance": 100,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "upplier1",
+          "parentGroup": "Sundry Creditors",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Vbjk",
+          "parentGroup": "Loans & Advances (Asset)",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "company": "Tally",
+      "dataType": "vouchers",
+      "syncId": "AGoiZRyKv288FJw-B5e1aRXbrRHu",
+      "cpiMessageId": "AGoiZRyKv288FJw-B5e1aRXbrRHu",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.129Z",
+      "totalRecords": 3,
+      "timestamp": "2026-06-05T09:44:14.129Z",
+      "summary": {
+        "totalRecords": 3,
+        "totalLedgers": 0,
+        "totalVouchers": 3,
+        "totalStockItems": 0,
+        "totalAmount": 27610,
+        "byType": {
+          "Journal": 2,
+          "Receipt": 1
+        }
+      },
+      "data": [
+        {
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Journal",
+          "partyName": "Please",
+          "netAmount": 13590,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "voucherNumber": "2",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Journal",
+          "partyName": "ABC Traders",
+          "netAmount": 14010,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Receipt",
+          "partyName": "Supplier1",
+          "netAmount": 10,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "company": "Tally",
+      "dataType": "stockItems",
+      "syncId": "AGoiZRwWUfCJmueMhnQzQzRmYMxq",
+      "cpiMessageId": "AGoiZRwWUfCJmueMhnQzQzRmYMxq",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.142Z",
+      "totalRecords": 0,
+      "timestamp": "2026-06-05T09:44:14.142Z",
+      "summary": {
+        "totalRecords": 0,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0
+      },
+      "data": []
+    },
+    {
+      "id": 12,
+      "company": "SAURAbh",
+      "dataType": "all",
+      "syncId": "AGoibEmA4ZbGtbsfakCic3l7NyNf",
+      "cpiMessageId": "AGoibEmA4ZbGtbsfakCic3l7NyNf",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.152Z",
+      "totalRecords": 1,
+      "timestamp": "2026-06-05T09:44:14.152Z",
+      "summary": {
+        "totalRecords": 1,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 4,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "ledgers": [
+            {
+              "name": "Cash",
+              "parentGroup": "Cash-in-Hand",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger1",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger2",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Profit & Loss A/c",
+              "parentGroup": "\u0004 Primary",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            }
+          ],
+          "vouchers": [],
+          "stockItems": []
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "company": "Aa",
+      "dataType": "ledgers",
+      "syncId": "AGoiXtyZB1xMHLa42WJ6tTQrplzk",
+      "cpiMessageId": "AGoiXtyZB1xMHLa42WJ6tTQrplzk",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.161Z",
+      "totalRecords": 6,
+      "timestamp": "2026-06-05T09:44:14.161Z",
+      "summary": {
+        "totalRecords": 6,
+        "totalLedgers": 6,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "partyLedgers": 0,
+        "withGstin": 0,
+        "withEmail": 0,
+        "totalBalance": 1067538,
+        "topGroups": [
+          {
+            "group": "Capital Account",
+            "count": 3
+          },
+          {
+            "group": "Cash-in-Hand",
+            "count": 2
+          },
+          {
+            "group": "\u0004 Primary",
+            "count": 1
+          }
+        ]
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Gsshf0hg",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 65422,
+          "closingBalance": 65422,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Shivam",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 563,
+          "closingBalance": 563,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Sudhir",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 999999,
+          "closingBalance": 999999,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Vaibhav",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 777,
+          "closingBalance": 777,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "company": "Aa",
+      "dataType": "vouchers",
+      "syncId": "AGoiXt0Ia4UFqJa4_TAbAQzaPs74",
+      "cpiMessageId": "AGoiXt0Ia4UFqJa4_TAbAQzaPs74",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T09:44:14.167Z",
+      "totalRecords": 0,
+      "timestamp": "2026-06-05T09:44:14.167Z",
+      "summary": {
+        "totalRecords": 0,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "byType": {}
+      },
+      "data": []
+    },
+    {
+      "id": 15,
+      "company": "SAURAbh",
+      "dataType": "all",
+      "syncId": "AGoip3b6OF-NRvcbBwlKiRwVeRbj",
+      "cpiMessageId": "AGoip3b6OF-NRvcbBwlKiRwVeRbj",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-05T10:40:31.879Z",
+      "totalRecords": 1,
+      "timestamp": "2026-06-05T10:40:31.879Z",
+      "summary": {
+        "totalRecords": 1,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 4,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "ledgers": [
+            {
+              "name": "Cash",
+              "parentGroup": "Cash-in-Hand",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger1",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Ledger2",
+              "parentGroup": "Capital Account",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            },
+            {
+              "name": "Profit & Loss A/c",
+              "parentGroup": "\u0004 Primary",
+              "type": "General",
+              "openingBalance": 0,
+              "closingBalance": 0,
+              "currency": "INR",
+              "countryCode": "IN"
+            }
+          ],
+          "vouchers": [],
+          "stockItems": []
         }
       ]
     }
   ],
-  "versionCounter": 5
+  "versionCounter": 15
 }
