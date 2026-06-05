@@ -9,7 +9,7 @@ sap.ui.define([
     "use strict";
 
     var CAP_URL  = "/odata/v4/tally";
-    var TABS = { LEDGERS: "Ledgers", VOUCHERS: "Vouchers", STOCK: "StockItems" };
+    var TABS = { HISTORY: "SyncHistory", LEDGERS: "Ledgers", VOUCHERS: "Vouchers", STOCK: "StockItems" };
 
     return Controller.extend("app.tallyapp.controller.View1", {
 
@@ -25,10 +25,11 @@ sap.ui.define([
                 ledgers:       [],
                 vouchers:      [],
                 stockItems:    [],
+                syncs:         [],
                 busy:          false,
                 hasError:      false,
                 lastRefreshed: "",
-                tab:           TABS.LEDGERS
+                tab:           TABS.HISTORY
             });
             this.getView().setModel(oModel);
             this.loadData();
@@ -40,14 +41,14 @@ sap.ui.define([
             oModel.setProperty("/hasError", false);
 
             console.log("──────────────────────────────────────────────");
-            console.log("[fetch] GET /odata/v4/tally/Syncs?$orderby=pushedAt desc&$top=1");
+            console.log("[fetch] GET /odata/v4/tally/Syncs?$orderby=pushedAt desc&$top=20");
             console.log("[fetch] GET /odata/v4/tally/Ledgers");
             console.log("[fetch] GET /odata/v4/tally/Vouchers");
             console.log("[fetch] GET /odata/v4/tally/StockItems");
             console.log("──────────────────────────────────────────────");
 
             Promise.all([
-                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=1").then(function (r) {
+                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=20").then(function (r) {
                     console.log("[response] Syncs →", r.status, r.statusText);
                     return r.json();
                 }),
@@ -71,6 +72,7 @@ sap.ui.define([
                 var stockItems = results[3].value || [];
                 var latest = syncs[0] || {};
 
+                oModel.setProperty("/syncs",        syncs);
                 oModel.setProperty("/company",      latest.company      || "—");
                 oModel.setProperty("/dataType",     latest.dataType     || "—");
                 oModel.setProperty("/syncId",       latest.cpiMessageId || "—");
@@ -127,6 +129,7 @@ sap.ui.define([
             var tab = this.getView().getModel().getProperty("/tab");
             var table = tab === TABS.LEDGERS ? "ledgerTable"
                       : tab === TABS.VOUCHERS ? "voucherTable"
+                      : tab === TABS.HISTORY ? "syncTable"
                       : "stockTable";
             var oTable = this.byId(table);
             if (oTable && oTable.getBinding("items")) {
@@ -139,12 +142,14 @@ sap.ui.define([
             var tab = this.getView().getModel().getProperty("/tab");
             var tableId = tab === TABS.LEDGERS ? "ledgerTable"
                         : tab === TABS.VOUCHERS ? "voucherTable"
+                        : tab === TABS.HISTORY ? "syncTable"
                         : "stockTable";
             var oBinding = this.byId(tableId).getBinding("items");
             if (!oBinding) { return; }
 
             var filterField = tab === TABS.LEDGERS ? "name"
                             : tab === TABS.VOUCHERS ? "partyName"
+                            : tab === TABS.HISTORY ? "syncId"
                             : "stockName";
             oBinding.filter(sQuery
                 ? [new Filter(filterField, FilterOperator.Contains, sQuery)]
@@ -154,6 +159,39 @@ sap.ui.define([
         onRefresh: function () {
             this._clearSearch();
             this.loadData();
+        },
+
+        onFetchBtp: function () {
+            var that = this;
+            var oModel = this.getView().getModel();
+
+            oModel.setProperty("/busy", true);
+            MessageToast.show("Starting manual fetch from SAP BTP...");
+
+            fetch("/api/sync/btp-fetch", { method: "POST" })
+                .then(function (r) {
+                    var contentType = r.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        return r.json();
+                    } else {
+                        throw new Error("Server returned non-JSON response. Please ensure backend is running.");
+                    }
+                })
+                .then(function (result) {
+                    oModel.setProperty("/busy", false);
+                    if (result.success) {
+                        MessageBox.success("Fetch Completed!\n\nTotal records found: " + result.totalFound + "\nNew versions added: " + result.newVersions);
+                        that.loadData();
+                    } else {
+                        var msg = result.error + ": " + (result.details || "");
+                        if (result.tip) { msg += "\n\nTip: " + result.tip; }
+                        MessageBox.error(msg);
+                    }
+                })
+                .catch(function (e) {
+                    oModel.setProperty("/busy", false);
+                    MessageBox.error("Fetch Error: " + e.message);
+                });
         },
 
         formatBalance: function (v) {

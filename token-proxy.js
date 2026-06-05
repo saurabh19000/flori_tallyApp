@@ -79,19 +79,22 @@ function killPortIfBusy(port) {
 let cachedToken = null;
 let tokenExpiry = 0;
 
-function fetchToken() {
+function fetchToken(overrides) {
     return new Promise(function (resolve, reject) {
         const now = Date.now();
+        const clientId = (overrides && overrides.clientId) || CLIENT_ID;
+        const clientSecret = (overrides && overrides.clientSecret) || CLIENT_SECRET;
 
-        if (cachedToken && now < (tokenExpiry - 60000)) {
+        // Only use cache if using default credentials
+        if (!overrides && cachedToken && now < (tokenExpiry - 60000)) {
             console.log("[proxy] Using cached token (expires in",
                 Math.round((tokenExpiry - now) / 1000), "s)");
             return resolve(cachedToken);
         }
 
-        console.log("[proxy] Fetching new token from BTP UAA...");
+        console.log("[proxy] Fetching new token from BTP UAA for client:", clientId.substring(0, 8) + "...");
 
-        const credentials = Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64");
+        const credentials = Buffer.from(clientId + ":" + clientSecret).toString("base64");
         const body        = "grant_type=client_credentials";
         const url         = new URL(TOKEN_URL);
 
@@ -147,11 +150,108 @@ function fetchToken() {
     });
 }
 
+// ── Push to CPI write + Notify backend ─────────────────────────────────
+function pushToCpiAndBackend(body, res, overrides) {
+    fetchToken(overrides)
+    .then(function (token) {
+        return new Promise(function (resolve, reject) {
+            var url = new URL(CPI_API_BASE + "/http/tally-write");
+            var options = {
+                hostname: url.hostname,
+                port:     443,
+                path:     url.pathname + url.search,
+                method:   "POST",
+                headers:  {
+                    "Authorization":  "Bearer " + token.access_token,
+                    "Content-Type":   "application/json",
+                    "Content-Length": Buffer.byteLength(body),
+                    "Accept":         "application/json",
+                    "SapDataStoreId": "ALL_RECORDS"
+                }
+            };
+            var cpiReq = https.request(options, function (cpiRes) {
+                var data = "";
+                cpiRes.on("data", function (chunk) { data += chunk; });
+                cpiRes.on("end", function () {
+                    resolve({
+                        status: cpiRes.statusCode,
+                        body: data,
+                        cpiMessageId: cpiRes.headers["sap_messageprocessinglogid"]
+                            || cpiRes.headers["sap-message-id"] || crypto.randomUUID(),
+                        cpiDataStoreId: cpiRes.headers["sapdatastoreid"] || null
+                    });
+                });
+            });
+            cpiReq.on("error", reject);
+            cpiReq.write(body);
+            cpiReq.end();
+        });
+    })
+    .then(function (cpiResult) {
+        console.log("[proxy] CPI write:", cpiResult.status, "msg:", cpiResult.cpiMessageId);
+        return notifyBackend(body, cpiResult).then(function (backendResult) {
+            return { cpiResult: cpiResult, backendResult: backendResult };
+        });
+    })
+    .then(function (results) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({
+            success: true,
+            cpi:       { status: results.cpiResult.status, messageId: results.cpiResult.cpiMessageId, dataStoreId: results.cpiResult.cpiDataStoreId },
+            backend:   results.backendResult,
+            timestamp: new Date().toUTCString()
+        }));
+    })
+    .catch(function (err) {
+        console.error("[proxy] Push failed:", err.message);
+        res.writeHead(502, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
+    });
+}
+
+function notifyBackend(body, cpiResult) {
+    return new Promise(function (resolve, reject) {
+        var payload;
+        try { payload = JSON.parse(body); } catch (e) { payload = { data: [] }; }
+        var pushBody = JSON.stringify({
+            syncId:         cpiResult.cpiMessageId || cpiResult.cpiDataStoreId,
+            cpiMessageId:   cpiResult.cpiMessageId,
+            cpiDataStoreId: cpiResult.cpiDataStoreId,
+            cpiPushDate:    new Date().toUTCString(),
+            company:        payload.company || "—",
+            totalRecords:   payload.totalRecords || 0,
+            summary:        payload.summary || {},
+            data:           payload.data || [],
+            dataType:       payload.dataType || "Ledgers"
+        });
+        var options = {
+            hostname: "localhost",
+            port:     3003,
+            path:     "/api/push",
+            method:   "POST",
+            headers:  {
+                "Content-Type":   "application/json",
+                "Content-Length": Buffer.byteLength(pushBody)
+            }
+        };
+        var req = http.request(options, function (beRes) {
+            var data = "";
+            beRes.on("data", function (chunk) { data += chunk; });
+            beRes.on("end", function () {
+                try { resolve(JSON.parse(data)); } catch (e) { resolve({ raw: data }); }
+            });
+        });
+        req.on("error", reject);
+        req.write(pushBody);
+        req.end();
+    });
+}
+
 // ── CPI API proxy ─────────────────────────────────────────────────────────────
 const CPI_API_BASE_HOST = new URL(CPI_API_BASE).hostname;
 
-function proxyApiRequest(apiPath, res, extraHeaders) {
-    fetchToken()
+function proxyApiRequest(apiPath, res, extraHeaders, overrides) {
+    fetchToken(overrides)
     .then(function (token) {
         const headers = {
             "Authorization":  "Bearer " + token.access_token,
@@ -200,22 +300,22 @@ async function startServer() {
 
     const server = http.createServer(function (req, res) {
         res.setHeader("Access-Control-Allow-Origin",  "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, SapDataStoreId, X-BTP-Client-ID, X-BTP-Client-Secret");
 
         if (req.method === "OPTIONS") {
             res.writeHead(204);
             return res.end();
         }
 
-        if (req.method !== "GET") {
-            res.writeHead(404, { "Content-Type": "application/json" });
-            return res.end(JSON.stringify({ error: "Use GET /token or GET /api/*" }));
-        }
+        // Extract potential credential overrides from headers
+        const overrides = (req.headers["x-btp-client-id"] && req.headers["x-btp-client-secret"])
+            ? { clientId: req.headers["x-btp-client-id"], clientSecret: req.headers["x-btp-client-secret"] }
+            : null;
 
         // ── Route: /token ──
-        if (req.url === "/token") {
-            return fetchToken()
+        if (req.url === "/token" && req.method === "GET") {
+            return fetchToken(overrides)
             .then(function (token) {
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify(token));
@@ -227,8 +327,19 @@ async function startServer() {
             });
         }
 
-        // ── Route: /api/*  (proxy to CPI with Bearer token) ──
-        if (req.url.startsWith("/api/")) {
+        // ── Route: POST /api/http/tally-write  (push to CPI + notify backend) ──
+        if (req.url === "/api/http/tally-write" && req.method === "POST") {
+            var bodyChunks = [];
+            req.on("data", function (chunk) { bodyChunks.push(chunk); });
+            req.on("end", function () {
+                var body = Buffer.concat(bodyChunks).toString("utf8");
+                return pushToCpiAndBackend(body, res, overrides);
+            });
+            return;
+        }
+
+        // ── Route: GET /api/*  (proxy to CPI with Bearer token) ──
+        if (req.url.startsWith("/api/") && req.method === "GET") {
             const parsedUrl = new URL(req.url, "http://localhost");
             const storeId = parsedUrl.searchParams.get("storeId") || null;
             parsedUrl.searchParams.delete("storeId");
@@ -241,11 +352,11 @@ async function startServer() {
             }
 
             console.log("[proxy] Proxying to CPI:", apiPath);
-            return proxyApiRequest(apiPath, res, extraHeaders);
+            return proxyApiRequest(apiPath, res, extraHeaders, overrides);
         }
 
         res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Use GET /token or GET /api/*" }));
+        res.end(JSON.stringify({ error: "Use GET /token, GET /api/*, or POST /api/http/tally-write" }));
     });
 
     // Catch any remaining EADDRINUSE (race condition safety)

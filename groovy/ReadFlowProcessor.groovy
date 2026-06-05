@@ -1,4 +1,5 @@
 import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.json.JsonOutput
 
 def Message processData(Message message) {
     def body = message.getBody(String)
@@ -10,21 +11,42 @@ def Message processData(Message message) {
     }
 
     def entries = []
-    def xml = new groovy.util.XmlSlurper().parseText(body)
+    try {
+        def xml = new XmlSlurper().parseText(body)
 
-    if (xml.name() == 'messages') {
-        xml.message.each { msg ->
-            def val = msg.text()
-            if (val) entries.add(val)
+        if (xml.name() == 'messages') {
+            xml.message.each { msg ->
+                def val = msg.text()
+                if (val) {
+                    try {
+                        // If it's already JSON-like, we keep it as is for the join later, 
+                        // but it's safer to parse and re-stringify or collect as objects
+                        entries.add(new groovy.json.JsonSlurper().parseText(val))
+                    } catch (e) {
+                        entries.add(val)
+                    }
+                }
+            }
+        } else {
+            xml.entry.each { entry ->
+                def val = entry.value?.text()
+                if (val) {
+                    try {
+                        entries.add(new groovy.json.JsonSlurper().parseText(val))
+                    } catch (e) {
+                        entries.add(val)
+                    }
+                }
+            }
         }
-    } else {
-        xml.entry.each { entry ->
-            def val = entry.value?.text()
-            if (val) entries.add(val)
-        }
+    } catch (e) {
+        // Fallback for non-XML or malformed XML
+        message.setProperty("GroovyError", e.message)
     }
 
-    message.setBody("[" + entries.join(",") + "]")
+    // Safely produce a JSON array
+    message.setBody(JsonOutput.toJson(entries))
     message.setHeader("Content-Type", "application/json")
     return message
 }
+

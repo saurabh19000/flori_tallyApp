@@ -265,7 +265,142 @@
           "ifsc": null
         }
       ]
+    },
+    {
+      "id": 4,
+      "company": "—",
+      "dataType": "Ledgers",
+      "syncId": "AGoiTRrE3-QNOMzs5bAH1WW1_qbs",
+      "cpiMessageId": "AGoiTRrE3-QNOMzs5bAH1WW1_qbs",
+      "cpiDataStoreId": "a9d52f68-c3ec-4dc2-8056-9c35d928a118",
+      "cpiPushDate": "Fri, 05 Jun 2026 04:14:18 GMT",
+      "totalRecords": 0,
+      "timestamp": "2026-06-05T04:14:18.773Z",
+      "summary": {
+        "totalLedgers": 0,
+        "partyLedgers": 0,
+        "withGstin": 0,
+        "withEmail": 0,
+        "totalBalance": 0
+      },
+      "data": []
+    },
+    {
+      "id": 5,
+      "company": "Aa",
+      "dataType": "Ledgers",
+      "syncId": "AGoiTR_7ocq6-okfV0lILiecyi6C",
+      "cpiMessageId": "AGoiTR_7ocq6-okfV0lILiecyi6C",
+      "cpiDataStoreId": "e8af9c1d-ea28-4abe-889d-9a48c79c3fbb",
+      "cpiPushDate": "Fri, 05 Jun 2026 04:14:23 GMT",
+      "totalRecords": 6,
+      "timestamp": "2026-06-05T04:14:23.197Z",
+      "summary": {
+        "totalLedgers": 6,
+        "partyLedgers": 0,
+        "withGstin": 0,
+        "withEmail": 0,
+        "totalBalance": 0
+      },
+      "data": [
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001f",
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "openingBalance": 0,
+          "closingBalance": 777,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        },
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d4",
+          "name": "Gsshf0hg",
+          "parentGroup": "Cash-in-Hand",
+          "openingBalance": 65422,
+          "closingBalance": 65422,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        },
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-0000001e",
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        },
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d2",
+          "name": "Shivam",
+          "parentGroup": "Capital Account",
+          "openingBalance": 563,
+          "closingBalance": 563,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        },
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000d3",
+          "name": "Sudhir",
+          "parentGroup": "Capital Account",
+          "openingBalance": 999999,
+          "closingBalance": 999999,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        },
+        {
+          "guid": "9202a9c7-f84c-4aec-9df0-f62043fa0566-000000cc",
+          "name": "Vaibhav",
+          "parentGroup": "Capital Account",
+          "openingBalance": 0,
+          "closingBalance": 777,
+          "type": "General",
+          "phone": null,
+          "email": null,
+          "pan": null,
+          "gstin": null,
+          "state": null,
+          "pincode": null,
+          "bankAccount": null,
+          "ifsc": null
+        }
+      ]
     }
   ],
-  "versionCounter": 3
+  "versionCounter": 5
 }

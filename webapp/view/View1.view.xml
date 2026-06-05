@@ -32,12 +32,20 @@
                         design="Bold"
                         class="sapUiSmallMarginEnd"/>
                     <Button
+                        id="fetchBtpBtn"
+                        text="Fetch from BTP"
+                        icon="sap-icon://cloud"
+                        type="Ghost"
+                        press=".onFetchBtp"
+                        class="sapUiTinyMarginEnd"
+                        tooltip="Manually trigger a sync from SAP BTP"/>
+                    <Button
                         id="syncBtn"
-                        text="Refresh"
+                        text="Refresh UI"
                         icon="sap-icon://refresh"
                         type="Emphasized"
                         press=".onRefresh"
-                        tooltip="Refresh all data"/>
+                        tooltip="Refresh current dashboard data"/>
                 </contentRight>
             </Bar>
         </customHeader>
@@ -80,18 +88,18 @@
                     </VBox>
 
                     <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Last Sync" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <Label text="Last Sync Date" design="Bold" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/timestamp}" state="None" icon="sap-icon://appointment-2"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginBottom">
-                        <Label text="Total Records" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/totalRecords}" state="Success" icon="sap-icon://list"/>
+                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                        <Label text="Total System Records" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/totalRecords}" state="Warning" icon="sap-icon://database"/>
                     </VBox>
 
                     <VBox class="sapUiSmallMarginBottom">
-                        <Label text="CPI Message ID" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/cpiMessageId}" state="None" icon="sap-icon://message-id"/>
+                        <Label text="Current Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/syncId}" state="None" icon="sap-icon://message-id"/>
                     </VBox>
                 </HBox>
             </Panel>
@@ -132,13 +140,14 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="20%"><Text text="Ledger Name"/></Column>
-                                    <Column width="18%"><Text text="Parent Group"/></Column>
-                                    <Column width="10%" hAlign="Center"><Text text="Type"/></Column>
-                                    <Column width="14%" hAlign="End"><Text text="Opening Balance"/></Column>
-                                    <Column width="14%" hAlign="End"><Text text="Closing Balance"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Currency"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Country"/></Column>
+                                    <Column width="15%"><Text text="Ledger Name"/></Column>
+                                    <Column width="14%"><Text text="Parent Group"/></Column>
+                                    <Column width="8%" hAlign="Center"><Text text="Type"/></Column>
+                                    <Column width="10%" hAlign="End"><Text text="Opening"/></Column>
+                                    <Column width="10%" hAlign="End"><Text text="Closing"/></Column>
+                                    <Column width="15%" hAlign="Center"><Text text="Sync ID"/></Column>
+                                    <Column width="12%" hAlign="Center"><Text text="Sync Date"/></Column>
+                                    <Column width="6%" hAlign="Center"><Text text="Ctr"/></Column>
                                 </columns>
 
                                 <items>
@@ -150,7 +159,8 @@
                                         <Label text="{type}" design="Bold" wrapping="false"/>
                                         <ObjectNumber number="{path: 'openingBalance', formatter: '.formatBalance'}" state="None"/>
                                         <ObjectNumber number="{path: 'closingBalance', formatter: '.formatBalance'}" state="{path: 'closingBalance', formatter: '.formatBalanceState'}" emphasized="true"/>
-                                        <Text text="{currency}" wrapping="false"/>
+                                        <Text text="{syncId}" wrapping="false"/>
+                                        <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
                                         <HBox alignItems="Center" justifyContent="Center">
                                             <core:Icon src="sap-icon://world" tooltip="{countryCode}" color="#0070F2" class="sapUiTinyMarginEnd"/>
                                             <Text text="{countryCode}" wrapping="false"/>
@@ -196,15 +206,15 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="12%"><Text text="Date"/></Column>
-                                    <Column width="12%"><Text text="Voucher Type"/></Column>
-                                    <Column width="10%"><Text text="Voucher No"/></Column>
-                                    <Column width="14%"><Text text="Party Name"/></Column>
-                                    <Column width="14%"><Text text="Reference No"/></Column>
-                                    <Column width="18%"><Text text="Narration"/></Column>
-                                    <Column width="10%" hAlign="End"><Text text="Net Amount"/></Column>
-                                    <Column width="6%" hAlign="Center"><Text text="Invoice"/></Column>
-                                    <Column width="6%" hAlign="Center"><Text text="Lines"/></Column>
+                                    <Column width="11%"><Text text="Date"/></Column>
+                                    <Column width="11%"><Text text="Voucher Type"/></Column>
+                                    <Column width="8%"><Text text="Voucher No"/></Column>
+                                    <Column width="12%"><Text text="Party Name"/></Column>
+                                    <Column width="12%"><Text text="Reference No"/></Column>
+                                    <Column width="13%"><Text text="Narration"/></Column>
+                                    <Column width="12%" hAlign="Center"><Text text="Sync ID"/></Column>
+                                    <Column width="10%" hAlign="Center"><Text text="Sync Date"/></Column>
+                                    <Column width="11%" hAlign="End"><Text text="Amount"/></Column>
                                 </columns>
 
                                 <items>
@@ -215,9 +225,9 @@
                                         <ObjectIdentifier title="{partyName}" titleActive="false"/>
                                         <Text text="{referenceNo}" wrapping="false"/>
                                         <Text text="{narration}" wrapping="false" maxLines="1"/>
+                                        <Text text="{syncId}" wrapping="false"/>
+                                        <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
                                         <ObjectNumber number="{path: 'netAmount', formatter: '.formatBalance'}" state="{path: 'netAmount', formatter: '.formatBalanceState'}" emphasized="true"/>
-                                        <Text text="{path: 'isInvoice', formatter: '.formatBool'}"/>
-                                        <Text text="{lineItemCount}"/>
                                     </ColumnListItem>
                                 </items>
                             </Table>
@@ -259,14 +269,15 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="20%"><Text text="Stock Name"/></Column>
-                                    <Column width="14%"><Text text="Category"/></Column>
-                                    <Column width="12%" hAlign="End"><Text text="Rate"/></Column>
-                                    <Column width="12%" hAlign="End"><Text text="Quantity"/></Column>
-                                    <Column width="10%"><Text text="Unit"/></Column>
-                                    <Column width="12%" hAlign="End"><Text text="Amount"/></Column>
-                                    <Column width="12%" hAlign="End"><Text text="Opening Stock"/></Column>
-                                    <Column width="12%" hAlign="End"><Text text="Closing Stock"/></Column>
+                                    <Column width="15%"><Text text="Stock Name"/></Column>
+                                    <Column width="10%"><Text text="Category"/></Column>
+                                    <Column width="8%" hAlign="End"><Text text="Rate"/></Column>
+                                    <Column width="8%" hAlign="End"><Text text="Qty"/></Column>
+                                    <Column width="8%"><Text text="Unit"/></Column>
+                                    <Column width="10%" hAlign="End"><Text text="Amount"/></Column>
+                                    <Column width="15%" hAlign="Center"><Text text="Sync ID"/></Column>
+                                    <Column width="13%" hAlign="Center"><Text text="Sync Date"/></Column>
+                                    <Column width="8%" hAlign="End"><Text text="Closing"/></Column>
                                 </columns>
 
                                 <items>
@@ -277,7 +288,8 @@
                                         <Text text="{quantity}"/>
                                         <Text text="{unit}" wrapping="false"/>
                                         <ObjectNumber number="{path: 'amount', formatter: '.formatBalance'}" state="None"/>
-                                        <Text text="{openingStock}"/>
+                                        <Text text="{syncId}" wrapping="false"/>
+                                        <Text text="{path: 'syncDate', formatter: '.formatDate'}" wrapping="false"/>
                                         <Text text="{closingStock}"/>
                                     </ColumnListItem>
                                 </items>
