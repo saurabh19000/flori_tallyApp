@@ -17,7 +17,7 @@
     "ui5-middleware-simpleproxy": "^3.7.0"
   },
   "scripts": {
-    "start": "ui5 serve --open \"/index.html?sap-ui-xx-viewCache=false\"", 
+    "start": "ui5 serve --open \"/index.html?sap-ui-xx-viewCache=false\"",
     "start-backend": "node backend/src/server.js",
     "start-local": "ui5 serve --config ./ui5-local.yaml --open \"/index.html?sap-ui-xx-viewCache=false\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
@@ -29,5 +29,8 @@
     "start-variants-management": "fiori run --open \"/preview.html#app-preview\"",
     "unit-test": "fiori run --open \"test/unit/unitTests.qunit.html\""
   },
-  "sapuxLayer": "CUSTOMER_BASE"
+  "sapuxLayer": "CUSTOMER_BASE",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
 }

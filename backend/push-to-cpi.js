@@ -40,6 +40,8 @@
 
 "use strict";
 
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
+
 const https = require("https");
 const http = require("http");
 const fs = require("fs");
@@ -48,7 +50,7 @@ const crypto = require("crypto");
 // ── Config ─────────────────────────────────────────────────
 const TOKEN_PROXY  = "localhost:3002";
 const BACKEND      = "localhost:3003";
-const CPI_API_BASE = "https://690a9d08trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com";
+const CPI_API_BASE = process.env.BTP_CPI_API_BASE;
 
 // ── Helpers ────────────────────────────────────────────────
 function getToken() {

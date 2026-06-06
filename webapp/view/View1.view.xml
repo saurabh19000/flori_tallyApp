@@ -27,6 +27,15 @@
                         titleStyle="H4"/>
                 </contentLeft>
                 <contentRight>
+                    <Select 
+                        id="companySelect" 
+                        items="{/companies}" 
+                        selectedKey="{/selectedCompany}" 
+                        change=".onCompanyChange"
+                        class="sapUiSmallMarginEnd"
+                        tooltip="Select Company Context">
+                        <core:Item key="{key}" text="{text}" />
+                    </Select>
                     <Label
                         text="{/lastRefreshed}"
                         design="Bold"

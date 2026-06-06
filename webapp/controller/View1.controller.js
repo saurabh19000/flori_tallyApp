@@ -26,12 +26,42 @@ sap.ui.define([
                 vouchers:      [],
                 stockItems:    [],
                 syncs:         [],
+                companies:     [], // Add companies array
+                selectedCompany: "", // Track selected company
                 busy:          false,
                 hasError:      false,
                 lastRefreshed: "",
                 tab:           TABS.HISTORY
             });
             this.getView().setModel(oModel);
+            this.loadCompanies();
+            this.loadData();
+        },
+
+        loadCompanies: function () {
+            var that = this;
+            fetch("/api/companies")
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.companies.length > 0) {
+                        var oModel = that.getView().getModel();
+                        var formatted = data.companies.map(function(c) { return { key: c, text: c }; });
+                        // Add an "All Companies" option
+                        formatted.unshift({ key: "", text: "All Companies (Latest Overall)" });
+                        oModel.setProperty("/companies", formatted);
+                        
+                        // If no company is selected yet, default to the first real company
+                        if (!oModel.getProperty("/selectedCompany") && data.companies.length > 0) {
+                            oModel.setProperty("/selectedCompany", data.companies[0]);
+                            that.loadData(); // Reload with new default context
+                        }
+                    }
+                })
+                .catch(function(err) { console.error("Failed to load companies", err); });
+        },
+
+        onCompanyChange: function (oEvent) {
+            // Triggered when user selects a different company from dropdown
             this.loadData();
         },
 
@@ -40,33 +70,39 @@ sap.ui.define([
             oModel.setProperty("/busy", true);
             oModel.setProperty("/hasError", false);
 
-            console.log("──────────────────────────────────────────────");
-            console.log("[fetch] GET /odata/v4/tally/Syncs?$orderby=pushedAt desc&$top=20");
-            console.log("[fetch] GET /odata/v4/tally/Ledgers");
-            console.log("[fetch] GET /odata/v4/tally/Vouchers");
-            console.log("[fetch] GET /odata/v4/tally/StockItems");
-            console.log("──────────────────────────────────────────────");
+            var CAP_URL = "/odata/v4/tally";
+            var that = this;
+            var selectedCompany = oModel.getProperty("/selectedCompany");
+            var companyFilter = selectedCompany ? "?company=" + encodeURIComponent(selectedCompany) : "";
 
-            Promise.all([
-                fetch(CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=50").then(function (r) {
-                    return r.json();
-                }),
-                fetch(CAP_URL + "/Ledgers").then(function (r) {
-                    return r.json();
-                }),
-                fetch(CAP_URL + "/Vouchers").then(function (r) {
-                    return r.json();
-                }),
-                fetch(CAP_URL + "/StockItems").then(function (r) {
-                    return r.json();
+            // Step 1: Explicitly identify the absolute latest ID for the given context
+            var syncsUrl = CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=50" + (selectedCompany ? "&$filter=company eq '" + encodeURIComponent(selectedCompany) + "'" : "");
+            
+            fetch(syncsUrl)
+                .then(function (res) { return res.json(); })
+                .then(function (syncResult) {
+                    var syncs = syncResult.value || [];
+                    var latestSyncId = syncs.length > 0 ? syncs[0].syncId : null;
+                    
+                    if (!latestSyncId) {
+                        return Promise.resolve([syncResult, {value:[]}, {value:[]}, {value:[]}]);
+                    }
+
+                    // Step 2: Explicitly ask for data tied ONLY to that latest ID & Company
+                    var q = "?syncId=" + encodeURIComponent(latestSyncId) + (selectedCompany ? "&company=" + encodeURIComponent(selectedCompany) : "");
+                    return Promise.all([
+                        Promise.resolve(syncResult),
+                        fetch(CAP_URL + "/Ledgers" + q).then(r => r.json()),
+                        fetch(CAP_URL + "/Vouchers" + q).then(r => r.json()),
+                        fetch(CAP_URL + "/StockItems" + q).then(r => r.json())
+                    ]);
                 })
-            ])
-            .then(function (results) {
-                var syncs = results[0].value || [];
-                var ledgers = results[1].value || [];
-                var vouchers = results[2].value || [];
-                var stockItems = results[3].value || [];
-                var latest = syncs[0] || {};
+                .then(function (results) {
+                    var syncs = results[0].value || [];
+                    var ledgers = results[1].value || [];
+                    var vouchers = results[2].value || [];
+                    var stockItems = results[3].value || [];
+                    var latest = syncs[0] || {};
 
                 // Update Master Model with ALL data
                 oModel.setProperty("/syncs",        syncs);

@@ -18,18 +18,20 @@
 
 "use strict";
 
+require("dotenv").config();
+
 const http           = require("http");
 const https          = require("https");
 const net            = require("net");
 const { execSync }   = require("child_process");
 
-// ── BTP credentials ───────────────────────────────────────────────────────────
-const CLIENT_ID     = "sb-5c415a68-d997-4ef4-84be-b63e68ac3eab!b116673|it-rt-690a9d08trial!b196";       // ← replace
-const CLIENT_SECRET = "38dc02e8-3063-4682-bb4e-7d67b79cc8c6$S6n7sROZpLCALLQQ-_2ZSgpp04-JENbYZHZu-cUXQWs=";   // ← replace
-const TOKEN_URL     = "https://690a9d08trial.authentication.ap21.hana.ondemand.com/oauth/token";
+// ── BTP credentials (loaded from .env) ─────────────────────────────────────────
+const CLIENT_ID     = process.env.BTP_CLIENT_ID;
+const CLIENT_SECRET = process.env.BTP_CLIENT_SECRET;
+const TOKEN_URL     = process.env.BTP_TOKEN_URL;
 
 const PROXY_PORT   = 3002;
-const CPI_API_BASE = "https://690a9d08trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com";
+const CPI_API_BASE = process.env.BTP_CPI_API_BASE;
 
 // ── Kill whatever is already on PROXY_PORT ────────────────────────────────────
 function killPortIfBusy(port) {

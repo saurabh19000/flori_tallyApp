@@ -52,11 +52,27 @@ function generateFingerprint(data) {
 function addVersion(data) {
     try {
         let rawData = [];
+        
+        // --- ADVANCED DATA NORMALIZATION (Handles nested "all" payloads) ---
         if (Array.isArray(data)) {
             rawData = data;
         } else if (data && typeof data === "object") {
-            rawData = data.data || data.value || data.entries || data.records || [];
-            if (!Array.isArray(rawData) && typeof rawData === "object") rawData = [rawData];
+            let innerData = data.data || data.value || data.entries || data.records;
+            
+            if (Array.isArray(innerData)) {
+                rawData = innerData;
+            } else if (innerData && typeof innerData === "object") {
+                // Flatten the nested structure (e.g., data: { ledgers: [], vouchers: [] })
+                let flattened = [];
+                if (Array.isArray(innerData.ledgers)) flattened = flattened.concat(innerData.ledgers);
+                if (Array.isArray(innerData.vouchers)) flattened = flattened.concat(innerData.vouchers);
+                if (Array.isArray(innerData.stockItems)) flattened = flattened.concat(innerData.stockItems);
+                
+                // If we successfully flattened arrays, use them. Otherwise, wrap the object.
+                rawData = flattened.length > 0 ? flattened : [innerData];
+            } else {
+                 rawData = [data]; // Fallback
+            }
         }
 
         let company = data.company || "";
@@ -103,7 +119,7 @@ function addVersion(data) {
             cpiDataStoreId: data.cpiDataStoreId || null,
             cpiPushDate: data.cpiPushDate || new Date().toISOString(),
             totalRecords: summary.totalRecords,
-            timestamp: data.timestamp || istTimestamp(),
+            timestamp: data.cpiPushDate || data.timestamp || istTimestamp(), // PRIORITY FIX: Use BTP push date for absolute chronological accuracy
             summary: summary,
             data: rawData
         };
@@ -152,11 +168,22 @@ const router = Router();
 router.get("/versions", (req, res) => res.json(dataVersions.map(v => ({ id: v.id, timestamp: v.timestamp, syncId: v.syncId, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords }))));
 router.get("/versions/:id", (req, res) => { const v = dataVersions.find(v => v.id === parseInt(req.params.id)); v ? res.json(v) : res.status(404).json({ error: "Not found" }); });
 
+function getLatestVersion(companyFilter) {
+    if (dataVersions.length === 0) return null;
+    let filtered = dataVersions;
+    if (companyFilter) {
+        filtered = dataVersions.filter(v => v.company === companyFilter);
+    }
+    if (filtered.length === 0) return null;
+    return filtered.slice().sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""))[0];
+}
+
 router.get("/http/read-tally", function (req, res) {
+    const company = req.query.company;
     fetchFromCpi(null).then(data => {
-        if (data.error) return res.json(dataVersions[dataVersions.length - 1] || { data: [] });
+        if (data.error) return res.json(getLatestVersion(company) || { data: [] });
         const v = addVersion(data);
-        res.json(v || dataVersions[dataVersions.length - 1] || { data: [] });
+        res.json(v || getLatestVersion(company) || { data: [] });
     });
 });
 
@@ -171,7 +198,7 @@ router.post("/sync/btp-fetch", function (req, res) {
         items.forEach(item => {
             const syncId = item.syncId || item.cpiMessageId || meta.cpiMessageId;
             console.log("[debug-sync] Received ID from BTP:", syncId, "Company:", item.company);
-            const isDup = dataVersions.some(v => v.syncId === syncId);
+            const isDup = dataVersions.some(v => v.cpiMessageId === syncId || v.syncId === syncId);
             if (!isDup && (Array.isArray(item) || (item && (item.data || item.company)))) {
                 if (addVersion(item)) addedCount++; else skippedCount++;
             } else { skippedCount++; }
@@ -180,53 +207,83 @@ router.post("/sync/btp-fetch", function (req, res) {
     }).catch(err => res.json({ success: false, error: "Global Sync Exception", details: err.message }));
 });
 
-router.post("/refresh", (req, res) => { const latest = dataVersions[dataVersions.length - 1] || {}; res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords }); });
+router.get("/companies", (req, res) => {
+    const companies = [...new Set(dataVersions.map(v => v.company).filter(Boolean))];
+    res.json({ success: true, companies: companies });
+});
 
-router.get("/health", (_req, res) => { const latest = dataVersions[dataVersions.length - 1] || {}; res.json({ status: "ok", versions: dataVersions.length, lastSync: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords, company: latest.company }); });
+router.post("/refresh", (req, res) => { const latest = getLatestVersion(req.query.company) || {}; res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords }); });
+
+router.get("/health", (_req, res) => { const latest = getLatestVersion(_req.query.company) || {}; res.json({ status: "ok", versions: dataVersions.length, lastSync: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords, company: latest.company }); });
 
 const odataRouter = Router();
 
 odataRouter.get("/v4/tally/Syncs", (req, res) => {
-    const sorted = dataVersions.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    let filtered = dataVersions;
+    if (req.query.company) {
+        filtered = dataVersions.filter(v => v.company === req.query.company);
+    }
+    const sorted = filtered.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
     const top = parseInt(req.query.$top, 10) || sorted.length;
-    res.json({ value: sorted.slice(0, top).map(v => ({ syncId: v.cpiMessageId || v.syncId || "—", versionId: v.id, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords, cpiMessageId: v.cpiMessageId, pushedAt: v.timestamp, date: v.timestamp ? v.timestamp.split("T")[0] : null, totalLedgers: v.summary.totalLedgers || 0, totalVouchers: v.summary.totalVouchers || 0, totalAmount: v.summary.totalAmount || 0 })) });
+    res.json({ value: sorted.slice(0, top).map(v => {
+        const s = v.summary || {};
+        return { syncId: v.cpiMessageId || v.syncId || "—", versionId: v.id, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords, cpiMessageId: v.cpiMessageId, pushedAt: v.timestamp, date: v.timestamp ? v.timestamp.split("T")[0] : null, totalLedgers: s.totalLedgers || 0, totalVouchers: s.totalVouchers || 0, totalAmount: s.totalAmount || 0 };
+    }) });
 });
 
 odataRouter.get("/v4/tally/Ledgers", (req, res) => {
     let seen = {}; let ledgers = [];
-    for (let i = dataVersions.length - 1; i >= 0; i--) {
-        const v = dataVersions[i];
-        (v.data || []).forEach(d => {
-            if (!d.name || d.voucherDate) return;
-            const key = d.name + "|" + (d.parentGroup || "");
-            if (!seen[key]) { seen[key] = true; ledgers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
-        });
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            (v.data || []).forEach(d => {
+                if (d.name || d.parentGroup) {
+                    const key = d.name + "|" + (d.parentGroup || "");
+                    if (!seen[key]) { seen[key] = true; ledgers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+                }
+            });
+        }
     }
-    res.json({ value: ledgers.sort((a, b) => a.name.localeCompare(b.name)) });
+    res.json({ value: ledgers.sort((a, b) => (a.name || "").localeCompare(b.name || "")) });
 });
 
 odataRouter.get("/v4/tally/Vouchers", (req, res) => {
     let seen = {}; let vouchers = [];
-    for (let i = dataVersions.length - 1; i >= 0; i--) {
-        const v = dataVersions[i];
-        (v.data || []).forEach(d => {
-            if (!d.voucherDate && !d.partyName) return;
-            const key = d.guid || (d.voucherNumber + "|" + d.partyName);
-            if (!seen[key]) { seen[key] = true; vouchers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
-        });
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            (v.data || []).forEach(d => {
+                if (d.voucherDate || d.partyName || d.voucherNumber) {
+                    const key = d.guid || (d.voucherNumber + "|" + d.partyName);
+                    if (!seen[key]) { seen[key] = true; vouchers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+                }
+            });
+        }
     }
     res.json({ value: vouchers.sort((a, b) => (b.voucherDate || "").localeCompare(a.voucherDate || "")) });
 });
 
 odataRouter.get("/v4/tally/StockItems", (req, res) => {
     let seen = {}; let items = [];
-    for (let i = dataVersions.length - 1; i >= 0; i--) {
-        const v = dataVersions[i];
-        (v.data || []).forEach(d => {
-            if (!d.stockName && !d.rate) return;
-            const key = d.guid || d.stockName || JSON.stringify(d);
-            if (!seen[key]) { seen[key] = true; items.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
-        });
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            (v.data || []).forEach(d => {
+                if (d.stockName || d.rate || d.quantity) {
+                    const key = d.guid || d.stockName || JSON.stringify(d);
+                    if (!seen[key]) { seen[key] = true; items.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+                }
+            });
+        }
     }
     res.json({ value: items.sort((a, b) => (a.stockName || "").localeCompare(b.stockName || "")) });
 });
