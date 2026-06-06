@@ -1197,7 +1197,48 @@
           "countryCode": "IN"
         }
       ]
+    },
+    {
+      "id": 12,
+      "company": "Test23",
+      "dataType": "all",
+      "syncId": "AGojvkmvzuTsd3gQjlr6O2SmaKgk",
+      "cpiMessageId": "AGojvkmvzuTsd3gQjlr6O2SmaKgk",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T06:29:39.981Z",
+      "totalRecords": 2,
+      "timestamp": "2026-06-06T06:29:39.981Z",
+      "summary": {
+        "totalRecords": 2,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 2,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
     }
   ],
-  "versionCounter": 11
+  "versionCounter": 12
 }

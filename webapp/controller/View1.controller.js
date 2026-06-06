@@ -26,8 +26,8 @@ sap.ui.define([
                 vouchers:      [],
                 stockItems:    [],
                 syncs:         [],
-                companies:     [], // Add companies array
-                selectedCompany: "", // Track selected company
+                companies:     [],
+                selectedCompany: "", // Default to All Companies
                 busy:          false,
                 hasError:      false,
                 lastRefreshed: "",
@@ -43,29 +43,30 @@ sap.ui.define([
             fetch("/api/companies")
                 .then(function(res) { return res.json(); })
                 .then(function(data) {
-                    if (data.success && data.companies.length > 0) {
+                    if (data.success) {
                         var oModel = that.getView().getModel();
                         var formatted = data.companies.map(function(c) { return { key: c, text: c }; });
-                        // Add an "All Companies" option
                         formatted.unshift({ key: "", text: "All Companies (Latest Overall)" });
                         oModel.setProperty("/companies", formatted);
-                        
-                        // If no company is selected yet, default to the first real company
-                        if (!oModel.getProperty("/selectedCompany") && data.companies.length > 0) {
-                            oModel.setProperty("/selectedCompany", data.companies[0]);
-                            that.loadData(); // Reload with new default context
-                        }
                     }
                 })
                 .catch(function(err) { console.error("Failed to load companies", err); });
         },
 
         onCompanyChange: function (oEvent) {
-            // Triggered when user selects a different company from dropdown
             this.loadData();
         },
 
-        loadData: function () {
+        onSyncSelect: function (oEvent) {
+            var oListItem = oEvent.getParameter("listItem") || oEvent.getSource();
+            var oContext = oListItem.getBindingContext();
+            if (!oContext) return;
+            var oSync = oContext.getObject();
+            this.loadData(oSync.syncId);
+            MessageToast.show("Viewing specific sync: " + oSync.syncId);
+        },
+
+        loadData: function (specificSyncId) {
             var oModel = this.getView().getModel();
             oModel.setProperty("/busy", true);
             oModel.setProperty("/hasError", false);
@@ -73,23 +74,22 @@ sap.ui.define([
             var CAP_URL = "/odata/v4/tally";
             var that = this;
             var selectedCompany = oModel.getProperty("/selectedCompany");
-            var companyFilter = selectedCompany ? "?company=" + encodeURIComponent(selectedCompany) : "";
-
-            // Step 1: Explicitly identify the absolute latest ID for the given context
-            var syncsUrl = CAP_URL + "/Syncs?$orderby=pushedAt desc&$top=50" + (selectedCompany ? "&$filter=company eq '" + encodeURIComponent(selectedCompany) + "'" : "");
+            
+            // Step 1: Identify the sync ID to fetch data for
+            var syncsUrl = CAP_URL + "/Syncs?$top=50" + (selectedCompany ? "&company=" + encodeURIComponent(selectedCompany) : "");
             
             fetch(syncsUrl)
                 .then(function (res) { return res.json(); })
                 .then(function (syncResult) {
                     var syncs = syncResult.value || [];
-                    var latestSyncId = syncs.length > 0 ? syncs[0].syncId : null;
+                    var targetSyncId = specificSyncId || (syncs.length > 0 ? syncs[0].syncId : null);
                     
-                    if (!latestSyncId) {
+                    if (!targetSyncId) {
                         return Promise.resolve([syncResult, {value:[]}, {value:[]}, {value:[]}]);
                     }
 
-                    // Step 2: Explicitly ask for data tied ONLY to that latest ID & Company
-                    var q = "?syncId=" + encodeURIComponent(latestSyncId) + (selectedCompany ? "&company=" + encodeURIComponent(selectedCompany) : "");
+                    // Step 2: Fetch data for the identified sync
+                    var q = "?syncId=" + encodeURIComponent(targetSyncId);
                     return Promise.all([
                         Promise.resolve(syncResult),
                         fetch(CAP_URL + "/Ledgers" + q).then(r => r.json()),
@@ -102,7 +102,10 @@ sap.ui.define([
                     var ledgers = results[1].value || [];
                     var vouchers = results[2].value || [];
                     var stockItems = results[3].value || [];
-                    var latest = syncs[0] || {};
+                    
+                    // Identify the record we are currently displaying in the summary
+                    var currentSyncId = specificSyncId || (syncs.length > 0 ? syncs[0].syncId : null);
+                    var latest = syncs.find(s => s.syncId === currentSyncId) || syncs[0] || {};
 
                 // Update Master Model with ALL data
                 oModel.setProperty("/syncs",        syncs);
@@ -190,6 +193,7 @@ sap.ui.define([
 
         onRefresh: function () {
             this._clearSearch();
+            this.loadCompanies();
             this.loadData();
         },
 
@@ -273,6 +277,7 @@ sap.ui.define([
                 })
                 .then(function (result) {
                     that._oBusyDialog.close();
+                    that.loadCompanies();
                     
                     if (result.success) {
                         if (result.newVersions > 0) {

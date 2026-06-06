@@ -156,7 +156,8 @@
                                 alternateRowColors="true"
                                 sticky="ColumnHeaders"
                                 noDataText="No synchronization history found."
-                                mode="None">
+                                mode="SingleSelectMaster"
+                                selectionChange=".onSyncSelect">
 
                                 <columns>
                                     <Column width="15%"><Text text="Version ID"/></Column>

@@ -220,8 +220,18 @@ const odataRouter = Router();
 
 odataRouter.get("/v4/tally/Syncs", (req, res) => {
     let filtered = dataVersions;
-    if (req.query.company) {
-        filtered = dataVersions.filter(v => v.company === req.query.company);
+    let companyFilter = req.query.company;
+
+    // Support OData $filter=company eq '...'
+    if (!companyFilter && req.query.$filter) {
+        const match = req.query.$filter.match(/company eq '(.*?)'/);
+        if (match) {
+            companyFilter = decodeURIComponent(match[1]);
+        }
+    }
+
+    if (companyFilter) {
+        filtered = dataVersions.filter(v => v.company === companyFilter);
     }
     const sorted = filtered.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
     const top = parseInt(req.query.$top, 10) || sorted.length;

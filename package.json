@@ -12,13 +12,16 @@
     "@sap-ux/eslint-plugin-fiori-tools": "^9.0.0",
     "@sap/ux-ui5-tooling": "1",
     "@ui5/cli": "^4.0.33",
+    "concurrently": "^10.0.3",
     "eslint": "^9",
     "http-proxy-middleware": "^3.0.5",
     "ui5-middleware-simpleproxy": "^3.7.0"
   },
   "scripts": {
     "start": "ui5 serve --open \"/index.html?sap-ui-xx-viewCache=false\"",
+    "start-proxy": "node token-proxy.js",
     "start-backend": "node backend/src/server.js",
+    "dev": "concurrently --kill-others \"npm run start-proxy\" \"npm run start-backend\" \"npm run start\"",
     "start-local": "ui5 serve --config ./ui5-local.yaml --open \"/index.html?sap-ui-xx-viewCache=false\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
     "lint": "eslint ./",
