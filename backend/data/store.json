@@ -1238,7 +1238,408 @@
           "countryCode": "IN"
         }
       ]
+    },
+    {
+      "id": 13,
+      "company": "Testingfinal",
+      "dataType": "all",
+      "syncId": "AGojxl2yH2KJZcN2NJSGQOS0NEBT",
+      "cpiMessageId": "AGojxl2yH2KJZcN2NJSGQOS0NEBT",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T07:04:11.794Z",
+      "totalRecords": 7,
+      "timestamp": "2026-06-06T07:04:11.794Z",
+      "summary": {
+        "totalRecords": 7,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 5,
+        "vouchers": 2,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 77679,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testing1userledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 500,
+          "closingBalance": 497,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testledger2",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 600,
+          "closingBalance": 77076,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testuserledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 700,
+          "closingBalance": 700,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 3,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "voucherNumber": "2",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 77676,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "company": "Testingfinal",
+      "dataType": "all",
+      "syncId": "AGojxtdEv_q1YYDyljX2Cr9rRrEN",
+      "cpiMessageId": "AGojxtdEv_q1YYDyljX2Cr9rRrEN",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T07:06:10.644Z",
+      "totalRecords": 8,
+      "timestamp": "2026-06-06T07:06:10.644Z",
+      "summary": {
+        "totalRecords": 8,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 5,
+        "vouchers": 2,
+        "stockItems": 1
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 77679,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testing1userledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 500,
+          "closingBalance": 497,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testledger2",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 600,
+          "closingBalance": 77076,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testuserledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 700,
+          "closingBalance": 700,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 3,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "voucherNumber": "2",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 77676,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "name": "Bottle",
+          "group": "\u0004 Primary",
+          "category": "\u0004 Not Applicable",
+          "baseUnit": "\u0004 Not Applicable",
+          "openingQty": 0,
+          "openingValue": 66,
+          "closingQty": 0,
+          "closingValue": 66,
+          "rate": 0
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "company": "Testingfinal",
+      "dataType": "all",
+      "syncId": "AGojyGfcUCvp15aGUFqVeNCsGIl0",
+      "cpiMessageId": "AGojyGfcUCvp15aGUFqVeNCsGIl0",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T07:12:51.581Z",
+      "totalRecords": 11,
+      "timestamp": "2026-06-06T07:12:51.581Z",
+      "summary": {
+        "totalRecords": 11,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 5,
+        "vouchers": 2,
+        "stockItems": 4
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 77679,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testing1userledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 500,
+          "closingBalance": 497,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testledger2",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 600,
+          "closingBalance": 77076,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Testuserledger",
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 700,
+          "closingBalance": 700,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "voucherNumber": "1",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 3,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "voucherNumber": "2",
+          "voucherDate": "2026-04-01",
+          "voucherType": "Payment",
+          "partyName": "Cash",
+          "netAmount": 77676,
+          "isGstInvoice": false,
+          "ledgerEntries": [],
+          "inventoryEntries": []
+        },
+        {
+          "name": "Bottle",
+          "group": "\u0004 Primary",
+          "category": "\u0004 Not Applicable",
+          "baseUnit": "\u0004 Not Applicable",
+          "openingQty": 0,
+          "openingValue": 66,
+          "closingQty": 0,
+          "closingValue": 66,
+          "rate": 0
+        },
+        {
+          "name": "Fcgvxc",
+          "group": "\u0004 Primary",
+          "category": "\u0004 Not Applicable",
+          "baseUnit": "\u0004 Not Applicable",
+          "openingQty": 0,
+          "openingValue": 0,
+          "closingQty": 0,
+          "closingValue": 0,
+          "rate": 0
+        },
+        {
+          "name": "Ffffffffffffffffffffff",
+          "group": "\u0004 Primary",
+          "category": "\u0004 Not Applicable",
+          "baseUnit": "\u0004 Not Applicable",
+          "openingQty": 0,
+          "openingValue": 0,
+          "closingQty": 0,
+          "closingValue": 0,
+          "rate": 0
+        },
+        {
+          "name": "Nasfn",
+          "group": "\u0004 Primary",
+          "category": "\u0004 Not Applicable",
+          "baseUnit": "\u0004 Not Applicable",
+          "openingQty": 0,
+          "openingValue": 123,
+          "closingQty": 0,
+          "closingValue": 123,
+          "rate": 0
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "company": "Test89",
+      "dataType": "all",
+      "syncId": "AGoj2loabl_pj7yVAbKqFe0pyVRR",
+      "cpiMessageId": "AGoj2loabl_pj7yVAbKqFe0pyVRR",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T08:36:07.596Z",
+      "totalRecords": 2,
+      "timestamp": "2026-06-06T08:36:07.596Z",
+      "summary": {
+        "totalRecords": 2,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 2,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "company": "Test123",
+      "dataType": "all",
+      "syncId": "AGoj29gxgX4aVi9HGdhN2XxTwIj6",
+      "cpiMessageId": "AGoj29gxgX4aVi9HGdhN2XxTwIj6",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-06T08:36:07.597Z",
+      "totalRecords": 2,
+      "timestamp": "2026-06-06T08:36:07.597Z",
+      "summary": {
+        "totalRecords": 2,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 2,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "name": "Cash",
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        },
+        {
+          "name": "Profit & Loss A/c",
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "currency": "INR",
+          "countryCode": "IN"
+        }
+      ]
     }
   ],
-  "versionCounter": 12
+  "versionCounter": 17
 }

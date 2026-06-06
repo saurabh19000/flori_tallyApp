@@ -249,8 +249,13 @@ odataRouter.get("/v4/tally/Ledgers", (req, res) => {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
+            // Allow Ledgers, TallyData, or mixed 'all' payloads
+            if (v.dataType !== "Ledgers" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+            
             (v.data || []).forEach(d => {
-                if (d.name || d.parentGroup) {
+                // A Ledger MUST have a name AND a parentGroup. 
+                // Stock Items use 'group' or 'category', not 'parentGroup'.
+                if (d.name && d.parentGroup) {
                     const key = d.name + "|" + (d.parentGroup || "");
                     if (!seen[key]) { seen[key] = true; ledgers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
                 }
@@ -268,6 +273,8 @@ odataRouter.get("/v4/tally/Vouchers", (req, res) => {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
+            if (v.dataType !== "Vouchers" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+
             (v.data || []).forEach(d => {
                 if (d.voucherDate || d.partyName || d.voucherNumber) {
                     const key = d.guid || (d.voucherNumber + "|" + d.partyName);
@@ -287,10 +294,22 @@ odataRouter.get("/v4/tally/StockItems", (req, res) => {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
+            if (v.dataType !== "Stock Items" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+
             (v.data || []).forEach(d => {
-                if (d.stockName || d.rate || d.quantity) {
-                    const key = d.guid || d.stockName || JSON.stringify(d);
-                    if (!seen[key]) { seen[key] = true; items.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+                // Stock Items might use 'stockName' or just 'name'. 
+                // They are distinguished by 'group', 'category', 'baseUnit', or 'openingQty'.
+                const isStock = d.stockName || d.category || d.baseUnit || d.openingQty !== undefined || (d.name && d.group && !d.parentGroup);
+                
+                if (isStock) {
+                    const key = d.guid || d.stockName || d.name || JSON.stringify(d);
+                    if (!seen[key]) { 
+                        seen[key] = true; 
+                        // Map 'name' to 'stockName' if 'stockName' is missing for UI consistency
+                        const item = Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp });
+                        if (!item.stockName && item.name) item.stockName = item.name;
+                        items.push(item); 
+                    }
                 }
             });
         }
@@ -298,4 +317,4 @@ odataRouter.get("/v4/tally/StockItems", (req, res) => {
     res.json({ value: items.sort((a, b) => (a.stockName || "").localeCompare(b.stockName || "")) });
 });
 
-module.exports = { router, odataRouter, addVersion, fetchFromCpi, dataVersions };
+module.exports = { router, odataRouter, addVersion, fetchFromCpi, fetchFreshFromCpi, dataVersions };
