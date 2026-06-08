@@ -1639,7 +1639,110 @@
           "countryCode": "IN"
         }
       ]
+    },
+    {
+      "id": 18,
+      "company": "SAURAbh",
+      "dataType": "all",
+      "syncId": "AGomVRIj9ZkrOQOt4YajP0lDnoGf",
+      "cpiMessageId": "AGomVRIj9ZkrOQOt4YajP0lDnoGf",
+      "cpiDataStoreId": null,
+      "cpiPushDate": "2026-06-08T05:39:23.180Z",
+      "totalRecords": 5,
+      "timestamp": "2026-06-08T05:39:23.180Z",
+      "summary": {
+        "totalRecords": 5,
+        "totalLedgers": 0,
+        "totalVouchers": 0,
+        "totalStockItems": 0,
+        "totalAmount": 0,
+        "ledgers": 5,
+        "vouchers": 0,
+        "stockItems": 0
+      },
+      "data": [
+        {
+          "name": null,
+          "parentGroup": "Cash-in-Hand",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "gstin": null,
+          "pan": null,
+          "email": null,
+          "phone": null,
+          "address": null,
+          "currency": "INR",
+          "countryCode": "IN",
+          "gstType": null,
+          "registrationType": null
+        },
+        {
+          "name": null,
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "gstin": null,
+          "pan": null,
+          "email": null,
+          "phone": null,
+          "address": null,
+          "currency": "INR",
+          "countryCode": "IN",
+          "gstType": null,
+          "registrationType": null
+        },
+        {
+          "name": null,
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "gstin": null,
+          "pan": null,
+          "email": null,
+          "phone": null,
+          "address": null,
+          "currency": "INR",
+          "countryCode": "IN",
+          "gstType": null,
+          "registrationType": null
+        },
+        {
+          "name": null,
+          "parentGroup": "\u0004 Primary",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "gstin": null,
+          "pan": null,
+          "email": null,
+          "phone": null,
+          "address": null,
+          "currency": "INR",
+          "countryCode": "IN",
+          "gstType": null,
+          "registrationType": null
+        },
+        {
+          "name": null,
+          "parentGroup": "Capital Account",
+          "type": "General",
+          "openingBalance": 0,
+          "closingBalance": 0,
+          "gstin": null,
+          "pan": null,
+          "email": null,
+          "phone": null,
+          "address": null,
+          "currency": "INR",
+          "countryCode": "IN",
+          "gstType": null,
+          "registrationType": null
+        }
+      ]
     }
   ],
-  "versionCounter": 17
+  "versionCounter": 18
 }

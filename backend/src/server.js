@@ -24,6 +24,7 @@ function startAutoSync() {
             if (result.error) return;
 
             const body = result.body;
+            console.log("[auto-sync] RAW DATA FROM BTP:", JSON.stringify(body, null, 2));
             const meta = result.meta;
             const items = Array.isArray(body) ? body : [body];
             

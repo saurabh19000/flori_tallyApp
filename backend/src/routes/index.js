@@ -96,15 +96,27 @@ function addVersion(data) {
         versionCounter++;
         const summary = {
             totalRecords: rawData.length,
-            totalLedgers: dataType.toLowerCase().includes("ledger") ? rawData.length : 0,
-            totalVouchers: dataType.toLowerCase().includes("voucher") ? rawData.length : 0,
-            totalStockItems: dataType.toLowerCase().includes("stock") ? rawData.length : 0,
+            totalLedgers: 0,
+            totalVouchers: 0,
+            totalStockItems: 0,
             totalAmount: 0
         };
         
         if (data.summary) {
             Object.assign(summary, data.summary);
-        } else {
+            // Map BTP field names to our UI field names if needed
+            if (data.summary.ledgers !== undefined) summary.totalLedgers = data.summary.ledgers;
+            if (data.summary.vouchers !== undefined) summary.totalVouchers = data.summary.vouchers;
+            if (data.summary.stockItems !== undefined) summary.totalStockItems = data.summary.stockItems;
+        } 
+        
+        // Fallback: If counts are still 0 but we have a dataType that suggests otherwise
+        const typeLower = dataType.toLowerCase();
+        if (summary.totalLedgers === 0 && typeLower.includes("ledger")) summary.totalLedgers = rawData.length;
+        if (summary.totalVouchers === 0 && typeLower.includes("voucher")) summary.totalVouchers = rawData.length;
+        if (summary.totalStockItems === 0 && typeLower.includes("stock")) summary.totalStockItems = rawData.length;
+
+        if (!summary.totalAmount) {
             try {
                 summary.totalAmount = rawData.reduce((sum, item) => sum + (parseFloat(item.netAmount || item.closingBalance || item.amount || 0)), 0);
             } catch (e) {}
@@ -188,10 +200,14 @@ router.get("/http/read-tally", function (req, res) {
 });
 
 router.post("/sync/btp-fetch", function (req, res) {
+    console.log("[debug-sync] Manual BTP Fetch triggered.");
     fetchFreshFromCpi(null).then(function (result) {
         if (result.error) return res.status(200).json({ success: false, error: "BTP Sync Exception", details: result.error });
         const body = result.body;
         const meta = result.meta;
+
+        console.log("[debug-sync] RAW DATA FROM BTP:", JSON.stringify(body, null, 2));
+
         const items = Array.isArray(body) ? body : [body];
         let addedCount = 0;
         let skippedCount = 0;
@@ -245,23 +261,36 @@ odataRouter.get("/v4/tally/Ledgers", (req, res) => {
     let seen = {}; let ledgers = [];
     const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
 
+    console.log(`[odata] Fetching Ledgers for SyncID: ${targetSyncId}`);
+
     if (targetSyncId) {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        console.log(`[odata] Found ${targetVersions.length} versions matching SyncID`);
+
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
-            // Allow Ledgers, TallyData, or mixed 'all' payloads
-            if (v.dataType !== "Ledgers" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "ledgers" && type !== "tallydata" && type !== "all") continue;
             
-            (v.data || []).forEach(d => {
-                // A Ledger MUST have a name AND a parentGroup. 
-                // Stock Items use 'group' or 'category', not 'parentGroup'.
-                if (d.name && d.parentGroup) {
-                    const key = d.name + "|" + (d.parentGroup || "");
-                    if (!seen[key]) { seen[key] = true; ledgers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+            (v.data || []).forEach((d, idx) => {
+                // Identify a Ledger by checking for properties unique to its structure.
+                const isLedger = d.parentGroup !== undefined || d.openingBalance !== undefined;
+                
+                if (isLedger) {
+                    // Robust deduplication key: use GUID or Name|Group, fallback to index to avoid merging unnamed records
+                    const key = d.guid || (d.name ? (d.name + "|" + (d.parentGroup || "")) : ("unnamed-" + idx));
+                    if (!seen[key]) { 
+                        seen[key] = true; 
+                        ledgers.push(Object.assign({}, d, { 
+                            syncId: v.cpiMessageId || v.syncId || "—", 
+                            syncDate: v.timestamp 
+                        })); 
+                    }
                 }
             });
         }
     }
+    console.log(`[odata] Returning ${ledgers.length} ledgers`);
     res.json({ value: ledgers.sort((a, b) => (a.name || "").localeCompare(b.name || "")) });
 });
 
@@ -273,7 +302,8 @@ odataRouter.get("/v4/tally/Vouchers", (req, res) => {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
-            if (v.dataType !== "Vouchers" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "vouchers" && type !== "tallydata" && type !== "all") continue;
 
             (v.data || []).forEach(d => {
                 if (d.voucherDate || d.partyName || d.voucherNumber) {
@@ -294,7 +324,8 @@ odataRouter.get("/v4/tally/StockItems", (req, res) => {
         const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         for (let i = targetVersions.length - 1; i >= 0; i--) {
             const v = targetVersions[i];
-            if (v.dataType !== "Stock Items" && v.dataType !== "TallyData" && v.dataType !== "all") continue;
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "stock items" && type !== "tallydata" && type !== "all") continue;
 
             (v.data || []).forEach(d => {
                 // Stock Items might use 'stockName' or just 'name'. 
