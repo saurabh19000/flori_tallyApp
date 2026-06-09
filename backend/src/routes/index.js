@@ -1,43 +1,12 @@
 const { Router } = require("express");
 const http = require("http");
 const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
 const istTimestamp = require("../helpers/istTimestamp");
 
-const STORE_FILE = path.join(__dirname, "..", "..", "data", "store.json");
 const TOKEN_PROXY = "localhost:3002";
 
 let dataVersions = [];
 let versionCounter = 0;
-
-function loadStore() {
-    try {
-        if (fs.existsSync(STORE_FILE)) {
-            var raw = fs.readFileSync(STORE_FILE, "utf8");
-            var store = JSON.parse(raw);
-            dataVersions = store.dataVersions || [];
-            versionCounter = store.versionCounter || 0;
-            console.log("[store] Loaded " + dataVersions.length + " versions from " + STORE_FILE);
-        }
-    } catch (err) {
-        console.error("[store] Load error:", err.message);
-    }
-}
-
-function saveStore() {
-    try {
-        var dir = path.dirname(STORE_FILE);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        fs.writeFileSync(STORE_FILE, JSON.stringify({ dataVersions: dataVersions, versionCounter: versionCounter }, null, 2));
-    } catch (err) {
-        console.error("[store] Save error:", err.message);
-    }
-}
-
-loadStore();
 
 function generateFingerprint(data) {
     const content = JSON.stringify({
@@ -137,7 +106,6 @@ function addVersion(data) {
         };
 
         dataVersions.push(version);
-        saveStore();
         console.log(`[backend] COMMITTED: Version ${version.id} [${company}] - ${version.totalRecords} records.`);
         return version;
     } catch (err) {
